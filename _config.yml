@@ -22,10 +22,10 @@ repository               : "wenjiefeng04/wenjiefeng04.github.io"
 #               Additional customization can be done by editing /_includes/author-profile.html
 author:
   # Biographic information
-  avatar           : "gargantua.jpg" # filename of avatar image placed in /images/, e.g. "avatar.jpg"
+  avatar           : "profile.jpg" # filename of avatar image placed in /images/, e.g. "avatar.jpg"
   name             : "Wenjie Feng"
   pronouns         : # example: "she/her"  
-  bio              : "I am currently a junior undergraduate student majored in Computer Science in CUHKSZ.\n\n I am mainly intersested in voice conversion, voice cloning (Speech Language Processing in general)"
+  bio              : "I am currently a junior undergraduate student majored in Computer Science in CUHKSZ.<br><br>I am mainly intersested in voice conversion, voice cloning (Speech Language Processing in general)" # using \n for line breaks is not acepted by Jekyll, so use <br> instead
   location         : "Shenzhen, China"
   employer         : "CUHK(SZ)"
   uri              : # URL
