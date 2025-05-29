@@ -14,26 +14,26 @@ main:
   # - title: "Talks"  # all talks is stored in /_talks dir via .md format. And follow the same format as the example has shown.  
   #   url: /talks/    
 
-  - title: "Teaching"
-    url: /teaching/    
-    
-  # - title: "Portfolio"
-  #   url: /portfolio/
-
   - title: "Projects"
     url: /projects/
 
-  # - title: "Blog Posts"
-  #   url: /year-archive/
+  - title: "Teaching"
+    url: /teaching/    
   
   - title: "Blogs"
     url: /year-archive/
 
+  # - title: "Portfolio"
+  #   url: /portfolio/
+
+  # - title: "Blog Posts"
+  #   url: /year-archive/
+
   - title: "CV"
-    url: /cv/
+    url: /files/cv.pdf
     
   # - title: "CV"
   #   url: /cv-json/
     
-  - title: "Guide"
-    url: /markdown/
+  # - title: "Guide"
+  #   url: /markdown/

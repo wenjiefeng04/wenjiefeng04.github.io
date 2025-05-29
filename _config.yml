@@ -22,12 +22,12 @@ repository               : "wenjiefeng04/wenjiefeng04.github.io"
 #               Additional customization can be done by editing /_includes/author-profile.html
 author:
   # Biographic information
-  avatar           : "profile.png"
+  avatar           : "gargantua.jpg" # filename of avatar image placed in /images/, e.g. "avatar.jpg"
   name             : "Wenjie Feng"
   pronouns         : # example: "she/her"  
-  bio              : "I am currently an undergraduate student majored in Computer Science and intersested in voice conversion, voice cloning (Speech Language Processing in general)"
+  bio              : "I am currently a junior undergraduate student majored in Computer Science.\n I am mainly intersested in voice conversion, voice cloning (Speech Language Processing in general)"
   location         : "Shenzhen, China"
-  employer         : "Chinese University of Hong Kong, Shenzhen"
+  employer         : "CUHK(SZ)"
   uri              : # URL
   email            : "12209012@link.cuhk.edu.cn" 
 
@@ -184,6 +184,14 @@ exclude:
   - README
   - tmp
   - vendor
+  - _posts/2012-08-14-blog-post-1.md
+  - _posts/2013-08-14-blog-post-2.md
+  - _posts/2014-08-16-blog-post-3.md
+  - _posts/2015-08-17-blog-post-4.md
+  - _posts/2199-01-01-future-post.md
+  - _pages/cv.md
+  - _pages/cv-json.md
+  - _data/cv.json
 keep_files:
   - .git
   - .svn
