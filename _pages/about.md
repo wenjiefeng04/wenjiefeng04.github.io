@@ -10,13 +10,13 @@ I am currently a 1st year PhD student majored in Artificial Intelligence in CUHK
 
 And now I am doing a marathon on AI study, physical wellbeing, mental discipline and control, and the seek of meaningful joy and better lifestyle. Now we intend to do **EVERYTHING below EVEYDAY! NO MATTER WHAT!**.
 
-Progress: {% include progress-bar.html day=20 total=365 %}
+Progress: {% include progress-bar.html day=0 total=365 %}
 
 Here is my TODOs:
 
-- [ ]  1 hour exercise (30 mins walk + 30 mins strength)
-- [ ]  10 hrs work (5 hrs AI study/research + 5 hrs others; can also be 6/4) **4 hrs high quality MIN**
-- [ ]  7-8 hrs sleep
-- [ ]  1.5 hrs play
+[ ]  1 hour exercise (30 mins walk + 30 mins strength)
+[ ]  10 hrs work (5 hrs AI study/research + 5 hrs others; can also be 6/4) **4 hrs high quality MIN**
+[ ]  7-8 hrs sleep
+[ ]  1.5 hrs play
 
-> Please notice, divide working hours like 4 hours and 4 hours, and maintain at least 1 and better 2 4-hours as max concentration
+> Please notice, divide working hours like 4 hours and 4 hours, and maintain at least 1 and better 2 4-hours at max concentration and efficiency
