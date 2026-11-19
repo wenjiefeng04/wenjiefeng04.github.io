@@ -1,36 +1,17 @@
 ---
 title: "Teaching"
 permalink: /teaching/
-author_profile: true
+author_profile: false
 ---
+I have served as a Teaching Assistant (TA) and an Undergraduate Student Teaching Fellow (USTF) at the Chinese University of Hong Kong, Shenzhen.
 
-I have served as an Undergraduate Student Teaching Fellow (USTF) at the Chinese University of Hong Kong, Shenzhen.
+## Teaching Assistant (TA)
 
-## 2025–2026
+- CSC3160: Fundamentals of Speech and Language Processing (Fall 2026) — By Prof. Satoshi Nakamura
 
-### CSC4001: Software Engineering (Spring 2026)
+## Undergraduate Student Teaching Fellow (USTF)
 
-- **Role:** Undergraduate Student Teaching Fellow
-- **Instructor:** Prof. Pinjia He
-
-### CSC3160: Fundamentals of Speech and Language Processing (Fall 2025)
-
-- **Role:** Undergraduate Student Teaching Fellow
-- **Instructor:** Prof. Satoshi Nakamura
-
-
-## 2024–2025
-
-### CSC3050: Computer Architecture (Spring 2025)
-
-- **Role:** Undergraduate Student Teaching Fellow
-- **Instructor:** Prof. Wei-Chung Hsu
-- **Responsibilities:** ...
-
-## 2023–2024
-
-### CSC3100: Data Structure (Fall 2024)
-
-- **Role:** Undergraduate Student Teaching Fellow
-- **Instructors:** Prof. Yixiang Fang & Prof. Li Jiang
-- **Responsibilities:** ...
+- CSC4001: Software Engineering (Spring 2026) — By Prof. Pinjia He
+- CSC3160: Fundamentals of Speech and Language Processing (Fall 2025) — By Prof. Satoshi Nakamura
+- CSC3050: Computer Architecture (Spring 2025) — By Prof. Wei-Chung Hsu
+- CSC3100: Data Structure (Fall 2024) — By Prof. Yixiang Fang & Prof. Li Jiang
