@@ -190,6 +190,8 @@ exclude:
   - _posts/2014-08-14-blog-post-3.md
   - _posts/2015-08-14-blog-post-4.md
   - _posts/2199-01-01-future-post.md
+  - _portfolio/2024-09-01-solla.md
+  - _portfolio/2025-09-01-virtual-patient.md
   - _pages/cv.md
   - _pages/cv-json.md
   - _data/cv.json
