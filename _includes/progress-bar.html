@@ -1,36 +1,32 @@
-{% assign day = include.day | default: 0 %}
-{% assign total = include.total | default: 365 %}
+{% assign day = include.day | default: 0 | plus: 0 %}
+{% assign total = include.total | default: 365 | plus: 0 %}
 {% assign pct = day | times: 100.0 | divided_by: total %}
 {% assign left = total | minus: day %}
 
 <div style="font-family:'JetBrains Mono','Fira Code',Consolas,monospace;
             background:#0d1117; border:1px solid #30363d; border-radius:6px;
             max-width:460px; padding:12px 14px; color:#c9d1d9;">
-  <!-- terminal prompt line -->
   <div style="display:flex; justify-content:space-between; font-size:12px;
               color:#8b949e; margin-bottom:8px; letter-spacing:.5px;">
-    <span>~/2026 $ cat progress.status</span>
-    <span style="color:#3fb950;">{{ "%03d" | format: day }}/{{ total }}</span>
+    <!-- <span>~/2026 $ cat progress.status</span> -->
+    <span style="color:#3fb950;">{% if day < 100 %}0{% endif %}{% if day < 10 %}0{% endif %}{{ day }}/{{ total }}</span>
   </div>
 
-  <!-- the bar -->
   <div style="position:relative; width:100%; height:12px; background:#161b22;
               border:1px solid #30363d; border-radius:3px; overflow:hidden;">
     <div style="width:{{ pct }}%;{% if day > 0 %}min-width:2px;{% endif %}
                 height:100%;
                 background:linear-gradient(90deg,#238636,#3fb950);
                 box-shadow:0 0 10px rgba(63,185,80,.6);"></div>
-    <!-- month tick marks: one separator every 1/12 -->
     <div style="position:absolute; inset:0;
                 background:repeating-linear-gradient(to right,
                   transparent 0, transparent calc(100%/12 - 1px),
                   #0d1117 calc(100%/12 - 1px), #0d1117 calc(100%/12));"></div>
   </div>
 
-  <!-- readout line -->
   <div style="display:flex; justify-content:space-between; font-size:12px;
               margin-top:8px; color:#8b949e;">
-    <span>{{ "%5.2f" | format: pct }}%</span>
+    <span>{{ pct | round: 2 }}%</span>
     <span>{{ left }}d remaining</span>
   </div>
 </div>
