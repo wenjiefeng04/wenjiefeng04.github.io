@@ -237,7 +237,7 @@ collections:
     permalink: /:collection/:path/
   portfolio:
     output: true
-    permalink: /projects/:basename/ # was: /:collection/:path/
+    permalink: /projects/:path/ # was: /:collection/:path/
   talks:
     output: true
     permalink: /:collection/:path/
