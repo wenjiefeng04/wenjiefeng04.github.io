@@ -186,8 +186,8 @@ exclude:
   - vendor
   - _posts/2012-08-14-blog-post-1.md
   - _posts/2013-08-14-blog-post-2.md
-  - _posts/2014-08-16-blog-post-3.md
-  - _posts/2015-08-17-blog-post-4.md
+  - _posts/2014-08-14-blog-post-3.md
+  - _posts/2015-08-14-blog-post-4.md
   - _posts/2199-01-01-future-post.md
   - _pages/cv.md
   - _pages/cv-json.md
@@ -237,7 +237,7 @@ collections:
     permalink: /:collection/:path/
   portfolio:
     output: true
-    permalink: /:collection/:path/
+    permalink: /projects/:basename/ # was: /:collection/:path/
   talks:
     output: true
     permalink: /:collection/:path/
