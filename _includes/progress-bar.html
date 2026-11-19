@@ -1,0 +1,7 @@
+{% assign day = include.day | default: 1 %}
+{% assign total = include.total | default: 365 %}
+<div style="width:100%; max-width:420px; background:#e9ecef; border-radius:6px; height:14px;">
+  <div style="width:{{ day | times: 100.0 | divided_by: total }}%; min-width:2px;
+              background:#2d8cf0; height:14px; border-radius:6px;"></div>
+</div>
+<p><small>Day {{ day }} / {{ total }}</small></p>

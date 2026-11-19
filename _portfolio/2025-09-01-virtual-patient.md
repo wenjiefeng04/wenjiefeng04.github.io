@@ -5,6 +5,7 @@ type: "Project"
 venue: "Spoken Language Communication Lab, CUHK(SZ)"
 date: 2025-09-01
 excerpt: "A multimodal Virtual Patient system with depression severity configurable via HAMD-17 scores, synchronizing facial expressions, non-verbal cues, and vocal prosody."
+drafts: true
 ---
 
 **Role:** Core developer &nbsp;|&nbsp; **Supervisor:** Prof. Satoshi Nakamura
