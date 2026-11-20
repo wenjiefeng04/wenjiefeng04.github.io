@@ -9,11 +9,13 @@
 {% assign logged_days = 0 %}
 {% assign tasks_done = 0 %}
 {% assign perfect_days = 0 %}
-{% for k, v in data %}
+{% for key in data %}
+  {% assign v = data[key] %}
   {% assign logged_days = logged_days | plus: 1 %}
   {% if v %}
-    {% assign tasks_done = tasks_done | plus: v | size %}
-    {% if v | size == 4 %}{% assign perfect_days = perfect_days | plus: 1 %}{% endif %}
+    {% assign n = v | size %}
+    {% assign tasks_done = tasks_done | plus: n %}
+    {% if n == 4 %}{% assign perfect_days = perfect_days | plus: 1 %}{% endif %}
   {% endif %}
 {% endfor %}
 
