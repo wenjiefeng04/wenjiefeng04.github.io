@@ -1,15 +1,15 @@
-/* Multi-year contribution-style tracker (2026 .. current year).
+/* Multi-year contribution-style tracker (2026 .. current year) with year tabs.
    Data: plain-text island #ct-data, rendered by Jekyll from _data/tracker/records.yml.
-   Format per entry: YYYY-MM-DD|task,task,task   (one per line, any whitespace around).
+   Entry format: YYYY-MM-DD|task,task,task  (one per line; whitespace-tolerant parse).
    Pure client-side: year grids, colors, tooltips, stats, Beijing-time "today". */
 (function () {
   'use strict';
   var dataEl = document.getElementById('ct-data');
   var yearsEl = document.getElementById('ct-years');
-  if (!dataEl || !yearsEl) return;
+  var navEl = document.getElementById('ct-years-nav');
+  if (!dataEl || !yearsEl || !navEl) return;
 
-  /* parse entries out of the raw text — immune to whitespace collapsing/concatenation,
-     because task names contain only letters and commas (regex stops at digits/other chars) */
+  /* ---- data: regex-extract entries (immune to whitespace collapse/concat) ---- */
   var DATA = {};
   var raw = dataEl.textContent || '';
   var entries = raw.match(/\d{4}-\d{2}-\d{2}\|[A-Za-z,]*/g) || [];
@@ -37,8 +37,8 @@
   var START_YEAR = 2026;
   var TASKS = ['exercise', 'study', 'diet', 'sleep'];
   var COLORS = ['#eac54f', '#9be9a8', '#40c463', '#30a14e', '#216e39'];
-  var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  var DOWS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  var DOWS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   var wrap = document.getElementById('ct-2026');
   var tip = document.getElementById('ct-tip');
   var stats = document.getElementById('ct-stats');
@@ -46,35 +46,32 @@
   function pad(n) { return n < 10 ? '0' + n : '' + n; }
   function keyOf(d) { return d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate()); }
 
-  // "today" in Asia/Shanghai (UTC+8, no DST) — live in the visitor's browser
+  /* "today" in Asia/Shanghai (UTC+8, no DST) — live in the visitor's browser */
   var TODAY = keyOf(new Date(Date.now() + 8 * 3600 * 1000));
   var CURRENT_YEAR = parseInt(TODAY.slice(0, 4), 10);
 
-  // ---------- one grid section per year, START_YEAR..CURRENT_YEAR ----------
-  var html = '', y, cells, cur, end, ii, mm, first, col, row, day, entry, count, bg;
-  for (y = START_YEAR; y <= CURRENT_YEAR; y++) {
+  /* ---- markup for one year's grid (Sunday-first weeks, GitHub layout) ---- */
+  function yearHTML(y) {
     var yStart = y + '-01-01';
     var yEnd = y + '-12-31';
-
-    // cells: Sunday on/before Jan 1 .. Saturday after Dec 31
-    cells = [];
-    cur = new Date(Date.UTC(y, 0, 1));
-    cur.setUTCDate(1 - cur.getUTCDay());           // back up to Sunday (underflows to Dec of prior year correctly)
-    end = new Date(Date.UTC(y, 11, 31));
+    var cells = [];
+    var cur = new Date(Date.UTC(y, 0, 1));
+    cur.setUTCDate(1 - cur.getUTCDay());              // back to Sunday (underflows into Dec correctly)
+    var end = new Date(Date.UTC(y, 11, 31));
     while (cur <= end) {
       var k = keyOf(cur);
       cells.push((k < yStart || k > yEnd) ? null : k);
       cur.setUTCDate(cur.getUTCDate() + 1);
     }
-    while (cells.length % 7 !== 0) cells.push(null); // pad to whole weeks
-    var cols = cells.length / 7;                    // 53 or 54 depending on year/leap
+    while (cells.length % 7 !== 0) cells.push(null);  // pad to whole weeks
+    var cols = cells.length / 7;                      // 53 or 54 depending on year
 
-    html += '<div class="ct-year-block">';
+    var html = '<div class="ct-year-view">';
     html += '<div class="ct-year-lab">' + y + '</div>';
     html += '<div class="ct-grid" style="grid-template-columns:26px repeat(' + cols + ',10px)">';
 
-    // month labels: week containing the 1st of each month
-    for (mm = 0; mm < 12; mm++) {
+    var mm, ii, first, col, row, day, entry, count, bg;
+    for (mm = 0; mm < 12; mm++) {                     // month labels at the first week containing the month
       var prefix = y + '-' + pad(mm + 1) + '-';
       first = -1;
       for (ii = 0; ii < cells.length; ii++) {
@@ -85,12 +82,10 @@
         html += '<span class="ct-lab" style="grid-column:' + col + ';grid-row:1">' + MONTHS[mm] + '</span>';
       }
     }
-    // weekday labels: rows 2..8 = Sun..Sat, so Mon=3, Wed=5, Fri=7
-    html += '<span class="ct-lab" style="grid-column:1;grid-row:3">Mon</span>' +
+    html += '<span class="ct-lab" style="grid-column:1;grid-row:3">Mon</span>' +   // rows 2..8 = Sun..Sat
             '<span class="ct-lab" style="grid-column:1;grid-row:5">Wed</span>' +
             '<span class="ct-lab" style="grid-column:1;grid-row:7">Fri</span>';
 
-    // day cells: index ii → week floor(ii/7), weekday ii%7 (0=Sun)
     for (ii = 0; ii < cells.length; ii++) {
       day = cells[ii];
       if (!day) continue;
@@ -98,18 +93,51 @@
       row = (ii % 7) + 2;
       entry = DATA[day];
       count = entry ? entry.length : 0;
-      if (day < START) bg = '#ffffff';              // before 2026-11-20
-      else if (day > TODAY) bg = '#cdd5dc';         // upcoming
-      else bg = COLORS[Math.min(count, 4)];         // yellow + 4 green shades
+      if (day < START) bg = '#ffffff';                // before tracker start
+      else if (day > TODAY) bg = '#cdd5dc';           // upcoming
+      else bg = COLORS[Math.min(count, 4)];           // 0 = yellow, 1..4 = green shades
       html += '<div class="ct-cell' + (day === TODAY ? ' ct-today' : '') +
               '" data-day="' + day +
               '" style="background:' + bg + ';grid-column:' + col + ';grid-row:' + row + '"></div>';
     }
     html += '</div></div>';
+    return html;
   }
-  yearsEl.innerHTML = html;
 
-  // ---------- tooltip: hover to follow, click to pin ----------
+  /* ---- year tabs: one button per year, default = current year ---- */
+  var pinned = null;
+  function hideTip() { if (!pinned) tip.style.display = 'none'; }
+
+  var navHtml = '';
+  for (var y = START_YEAR; y <= CURRENT_YEAR; y++) {
+    navHtml += '<button type="button" class="ct-year-btn" data-year="' + y + '">' + y + '</button>';
+  }
+  navEl.innerHTML = navHtml;
+
+  function selectYear(y) {
+    yearsEl.innerHTML = yearHTML(y);
+    var btns = navEl.querySelectorAll('.ct-year-btn');
+    for (var b = 0; b < btns.length; b++) {
+      var active = parseInt(btns[b].getAttribute('data-year'), 10) === y;
+      if (active) btns[b].classList.add('active');
+      else btns[b].classList.remove('active');
+    }
+    pinned = null;
+    hideTip();
+  }
+  navEl.addEventListener('click', function (e) {
+    var t = e.target;
+    while (t && t !== navEl) {
+      if (t.getAttribute && t.getAttribute('data-year')) {
+        selectYear(parseInt(t.getAttribute('data-year'), 10));
+        return;
+      }
+      t = t.parentNode;
+    }
+  });
+  selectYear(CURRENT_YEAR);
+
+  /* ---- tooltip: hover to follow, click to pin ---- */
   function tipHTML(day) {
     var d = new Date(day + 'T00:00:00Z');
     var head = day + ' (' + DOWS[d.getUTCDay()] + ')';
@@ -124,7 +152,6 @@
     return head + '<br>' + lines + '<br><b>' + entry.length + '/4</b>' + (entry.length === 4 ? ' &nbsp;perfect!' : '');
   }
 
-  var pinned = null;
   function showTip(cell, x, y) {
     tip.innerHTML = tipHTML(cell.getAttribute('data-day'));
     tip.style.display = 'block';
@@ -136,7 +163,6 @@
     tip.style.left = left + 'px';
     tip.style.top = top + 'px';
   }
-  function hideTip() { if (!pinned) tip.style.display = 'none'; }
   function cellFrom(e) {
     var t = e.target;
     while (t && t !== wrap) {
@@ -148,7 +174,8 @@
   wrap.addEventListener('mousemove', function (e) {
     if (pinned) return;
     var cell = cellFrom(e);
-    if (cell) showTip(cell, e.clientX, e.clientY); else hideTip();
+    if (cell) showTip(cell, e.clientX, e.clientY);
+    else hideTip();
   });
   wrap.addEventListener('mouseleave', hideTip);
   wrap.addEventListener('click', function (e) {
@@ -162,7 +189,7 @@
   });
   document.addEventListener('click', function () { pinned = null; hideTip(); });
 
-  // ---------- stats (all years) ----------
+  /* ---- stats (all years) ---- */
   var logged = 0, tasksSum = 0, perfect = 0, k2, v;
   for (k2 in DATA) {
     if (!Object.prototype.hasOwnProperty.call(DATA, k2)) continue;
