@@ -1,6 +1,14 @@
 {% assign data = site.data.tracker.records %}
 
-<pre id="ct-data" hidden aria-hidden="true">{{ data | to_json }}</pre>
+<pre id="ct-data" hidden aria-hidden="true">
+{% for item in data %}
+  {% assign key = item[0] %}
+  {% assign val = item[1] %}
+  {% if val and val | size > 0 %}
+{{ key }}|{{ val | join: "," }}
+  {% endif %}
+{% endfor %}
+</pre>
 
 <style>
   #ct-2026 { font-family: ui-monospace, SFMono-Regular, 'JetBrains Mono', Consolas, monospace;

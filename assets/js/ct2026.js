@@ -1,5 +1,6 @@
 /* Multi-year contribution-style tracker (2026 .. current year).
-   Data: JSON island #ct-data, rendered by Jekyll from _data/tracker/records.yml.
+   Data: plain-text island #ct-data, rendered by Jekyll from _data/tracker/records.yml.
+   Format per entry: YYYY-MM-DD|task,task,task   (one per line, any whitespace around).
    Pure client-side: year grids, colors, tooltips, stats, Beijing-time "today". */
 (function () {
   'use strict';
@@ -7,18 +8,30 @@
   var yearsEl = document.getElementById('ct-years');
   if (!dataEl || !yearsEl) return;
 
-  var DATA = null;
+  /* parse entries out of the raw text — immune to whitespace collapsing/concatenation,
+     because task names contain only letters and commas (regex stops at digits/other chars) */
+  var DATA = {};
   var raw = dataEl.textContent || '';
-  try {
-    DATA = JSON.parse(raw);
-  } catch (e) {
-    /* visible debug: show the parser error AND the raw text the pipeline delivered */
-    var snippet = raw.replace(/\s+/g, ' ').slice(0, 200);
-    yearsEl.innerHTML = '<div class="ct-err">tracker data failed to parse: ' + e.message +
-      '<br>raw received: [' + snippet + ']</div>';
+  var entries = raw.match(/\d{4}-\d{2}-\d{2}\|[A-Za-z,]*/g) || [];
+  for (var i = 0; i < entries.length; i++) {
+    var m = entries[i];
+    var sep = m.indexOf('|');
+    var day = m.slice(0, sep);
+    var tasks = m.slice(sep + 1);
+    var arr = [];
+    if (tasks) {
+      var parts = tasks.split(',');
+      for (var j = 0; j < parts.length; j++) {
+        var t = parts[j].replace(/^\s+|\s+$/g, '');
+        if (t) arr.push(t);
+      }
+    }
+    DATA[day] = arr;
+  }
+  if (raw.replace(/\s+/g, '').length === 0) {
+    yearsEl.innerHTML = '<div class="ct-err">tracker island is empty — is _data/tracker/records.yml in the build?</div>';
     return;
   }
-  if (!DATA || typeof DATA !== 'object') DATA = {};
 
   var START = '2026-11-20';
   var START_YEAR = 2026;
@@ -37,17 +50,16 @@
   var TODAY = keyOf(new Date(Date.now() + 8 * 3600 * 1000));
   var CURRENT_YEAR = parseInt(TODAY.slice(0, 4), 10);
 
-  // ---------- build one grid section per year, START_YEAR..CURRENT_YEAR ----------
-  var html = '';
-  var y, cells, cur, end, i, m, first, col, row, day, entry, count, bg;
+  // ---------- one grid section per year, START_YEAR..CURRENT_YEAR ----------
+  var html = '', y, cells, cur, end, ii, mm, first, col, row, day, entry, count, bg;
   for (y = START_YEAR; y <= CURRENT_YEAR; y++) {
     var yStart = y + '-01-01';
     var yEnd = y + '-12-31';
 
-    // cells: from the Sunday on/before Jan 1 to the Saturday after Dec 31
+    // cells: Sunday on/before Jan 1 .. Saturday after Dec 31
     cells = [];
     cur = new Date(Date.UTC(y, 0, 1));
-    cur.setUTCDate(1 - cur.getUTCDay());           // back up to Sunday
+    cur.setUTCDate(1 - cur.getUTCDay());           // back up to Sunday (underflows to Dec of prior year correctly)
     end = new Date(Date.UTC(y, 11, 31));
     while (cur <= end) {
       var k = keyOf(cur);
@@ -55,40 +67,40 @@
       cur.setUTCDate(cur.getUTCDate() + 1);
     }
     while (cells.length % 7 !== 0) cells.push(null); // pad to whole weeks
-    var cols = cells.length / 7;                    // 53 or 54, per year
+    var cols = cells.length / 7;                    // 53 or 54 depending on year/leap
 
     html += '<div class="ct-year-block">';
     html += '<div class="ct-year-lab">' + y + '</div>';
     html += '<div class="ct-grid" style="grid-template-columns:26px repeat(' + cols + ',10px)">';
 
-    // month labels: first week that contains each month
-    for (m = 0; m < 12; m++) {
-      var prefix = y + '-' + pad(m + 1) + '-';
+    // month labels: week containing the 1st of each month
+    for (mm = 0; mm < 12; mm++) {
+      var prefix = y + '-' + pad(mm + 1) + '-';
       first = -1;
-      for (i = 0; i < cells.length; i++) {
-        if (cells[i] && cells[i].indexOf(prefix) === 0) { first = i; break; }
+      for (ii = 0; ii < cells.length; ii++) {
+        if (cells[ii] && cells[ii].indexOf(prefix) === 0) { first = ii; break; }
       }
       if (first >= 0) {
         col = Math.floor(first / 7) + 2;
-        html += '<span class="ct-lab" style="grid-column:' + col + ';grid-row:1">' + MONTHS[m] + '</span>';
+        html += '<span class="ct-lab" style="grid-column:' + col + ';grid-row:1">' + MONTHS[mm] + '</span>';
       }
     }
-    // weekday labels (row 2..8 = Sun..Sat → Mon=3, Wed=5, Fri=7)
+    // weekday labels: rows 2..8 = Sun..Sat, so Mon=3, Wed=5, Fri=7
     html += '<span class="ct-lab" style="grid-column:1;grid-row:3">Mon</span>' +
             '<span class="ct-lab" style="grid-column:1;grid-row:5">Wed</span>' +
             '<span class="ct-lab" style="grid-column:1;grid-row:7">Fri</span>';
 
-    // day cells: index i → week floor(i/7), weekday i%7 (0=Sun)
-    for (i = 0; i < cells.length; i++) {
-      day = cells[i];
+    // day cells: index ii → week floor(ii/7), weekday ii%7 (0=Sun)
+    for (ii = 0; ii < cells.length; ii++) {
+      day = cells[ii];
       if (!day) continue;
-      col = Math.floor(i / 7) + 2;
-      row = (i % 7) + 2;
+      col = Math.floor(ii / 7) + 2;
+      row = (ii % 7) + 2;
       entry = DATA[day];
-      count = entry && entry.length ? entry.length : 0;
-      if (day < START) bg = '#ffffff';             // before 2026-11-20
-      else if (day > TODAY) bg = '#cdd5dc';        // upcoming
-      else bg = COLORS[Math.min(count, 4)];        // yellow + 4 green shades
+      count = entry ? entry.length : 0;
+      if (day < START) bg = '#ffffff';              // before 2026-11-20
+      else if (day > TODAY) bg = '#cdd5dc';         // upcoming
+      else bg = COLORS[Math.min(count, 4)];         // yellow + 4 green shades
       html += '<div class="ct-cell' + (day === TODAY ? ' ct-today' : '') +
               '" data-day="' + day +
               '" style="background:' + bg + ';grid-column:' + col + ';grid-row:' + row + '"></div>';
@@ -97,7 +109,7 @@
   }
   yearsEl.innerHTML = html;
 
-  // ---------- tooltip (hover to follow, click to pin) ----------
+  // ---------- tooltip: hover to follow, click to pin ----------
   function tipHTML(day) {
     var d = new Date(day + 'T00:00:00Z');
     var head = day + ' (' + DOWS[d.getUTCDay()] + ')';
@@ -105,9 +117,9 @@
     if (day > TODAY) return head + '<br><span class="no">upcoming</span>';
     var entry = DATA[day] || [];
     var lines = '';
-    for (var j = 0; j < TASKS.length; j++) {
-      var done = entry.indexOf(TASKS[j]) >= 0;
-      lines += '<span class="' + (done ? 'ok' : 'no') + '">' + (done ? '\u2713' : '\u2717') + ' ' + TASKS[j] + '</span>&nbsp;&nbsp;';
+    for (var jj = 0; jj < TASKS.length; jj++) {
+      var done = entry.indexOf(TASKS[jj]) >= 0;
+      lines += '<span class="' + (done ? 'ok' : 'no') + '">' + (done ? '\u2713' : '\u2717') + ' ' + TASKS[jj] + '</span>&nbsp;&nbsp;';
     }
     return head + '<br>' + lines + '<br><b>' + entry.length + '/4</b>' + (entry.length === 4 ? ' &nbsp;perfect!' : '');
   }
@@ -125,7 +137,6 @@
     tip.style.top = top + 'px';
   }
   function hideTip() { if (!pinned) tip.style.display = 'none'; }
-
   function cellFrom(e) {
     var t = e.target;
     while (t && t !== wrap) {
@@ -152,15 +163,13 @@
   document.addEventListener('click', function () { pinned = null; hideTip(); });
 
   // ---------- stats (all years) ----------
-  var logged = 0, tasks = 0, perfect = 0, k2, v;
+  var logged = 0, tasksSum = 0, perfect = 0, k2, v;
   for (k2 in DATA) {
     if (!Object.prototype.hasOwnProperty.call(DATA, k2)) continue;
     v = DATA[k2];
-    if (v && typeof v.length === 'number') {
-      logged++;
-      tasks += v.length;
-      if (v.length === 4) perfect++;
-    }
+    logged++;
+    tasksSum += v.length;
+    if (v.length === 4) perfect++;
   }
   var streak = 0;
   var probe = new Date(TODAY + 'T00:00:00Z');
@@ -171,6 +180,6 @@
     if (pe && pe.length > 0) { streak++; probe.setUTCDate(probe.getUTCDate() - 1); }
     else break;
   }
-  stats.textContent = logged + 'd logged \u00b7 ' + tasks + ' tasks \u00b7 ' +
+  stats.textContent = logged + 'd logged \u00b7 ' + tasksSum + ' tasks \u00b7 ' +
                       perfect + ' perfect \u00b7 streak ' + streak + 'd';
 })();
