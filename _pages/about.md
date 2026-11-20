@@ -12,8 +12,8 @@ And now I am doing a marathon on AI study, physical wellbeing, mental discipline
 
 Progress {% include progress-bar.html %}
 
-Here is my TODOs:
 
+TODOs:
 - 1 hour exercise (30 mins walk + 30 mins strength)
 - 10 hrs work (5 hrs AI study/research + 5 hrs others; can also be 6/4) **4 hrs high quality MIN**
 - healthy diet and **lose weight** 
@@ -22,5 +22,5 @@ Here is my TODOs:
 
 > Please notice, divide working hours like 4 hours and 4 hours, and maintain at least 1 and better 2 4-hours at max concentration and efficiency
 
-Daily tracker [EDIT](https://github.com/wenjiefeng04/wenjiefeng04.github.io/edit/master/_data/tracker/records.yml)
+[Daily tracker](https://github.com/wenjiefeng04/wenjiefeng04.github.io/edit/master/_data/tracker/records.yml)
 {% include contribution-tracker.html %}
