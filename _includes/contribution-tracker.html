@@ -1,10 +1,10 @@
 <!-- GitHub-style contribution tracker, 2026 (static, no JS) -->
 {% assign start_date = '2026-11-20' %}
-{% assign today = site.time | date: "%Y-%m-%d", "+08:00" %}
+{% assign today = site.time | date: "%Y-%m-%d" %}
 {% assign data = site.data.tracker.2026 %}
 
 {% assign month_names = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec' | split: ' ' %}
-{% assign month_days = '0 31 59 90 120 151 181 212 243 273 304 334' | split: ' ' %}
+{% assign month_cols = '2 6 10 14 19 23 27 32 36 41 45 49' | split: ' ' %}
 
 {% assign logged_days = 0 %}
 {% assign tasks_done = 0 %}
@@ -32,19 +32,23 @@
   <div style="display:grid; grid-template-columns:26px repeat(53,10px);
               grid-template-rows:14px repeat(7,10px); gap:2px; align-items:center;">
 
-    <span style="grid-column:1; grid-row:2; font-size:9px; color:#8b949e;">Mon</span>
-    <span style="grid-column:1; grid-row:4; font-size:9px; color:#8b949e;">Wed</span>
-    <span style="grid-column:1; grid-row:6; font-size:9px; color:#8b949e;">Fri</span>
+    <span style="grid-column:1; grid-row:3; font-size:9px; color:#8b949e;">Mon</span>
+    <span style="grid-column:1; grid-row:5; font-size:9px; color:#8b949e;">Wed</span>
+    <span style="grid-column:1; grid-row:7; font-size:9px; color:#8b949e;">Fri</span>
 
     {% for m in (0..11) %}
-      <span style="grid-column:{{ month_days[m] | divided_by: 7 | plus: 2 }}; grid-row:1;
+      <span style="grid-column:{{ month_cols[m] }}; grid-row:1;
                    font-size:9px; color:#8b949e;">{{ month_names[m] }}</span>
     {% endfor %}
 
+    {% assign col = 2 %}
     {% for i in (0..364) %}
+      {% if i | mod: 7 == 0 and i > 0 %}
+        {% assign col = col | plus: 1 %}
+      {% endif %}
+
       {% assign day_date = '2026-01-01' | days: i | date: '%Y-%m-%d' %}
-      {% assign row = '2026-01-01' | days: i | date: '%w' | plus: 1 %}
-      {% assign col = i | divided_by: 7 | plus: 2 %}
+      {% assign row = '2026-01-01' | days: i | date: '%w' | plus: 2 %}
       {% assign entry = data[day_date] %}
       {% assign count = 0 %}
       {% if entry %}{% assign count = entry | size %}{% endif %}
