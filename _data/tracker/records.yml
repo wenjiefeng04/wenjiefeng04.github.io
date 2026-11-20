@@ -1,12 +1,50 @@
-# All tracker records, every year. One line per day, any order.
-# Format: "YYYY-MM-DD": [task, ...]  
-# A day with no line = 0 tasks (renders yellow once that date has passed).
-# The tracker grid covers 2026 through the current year automatically.
-# Tasks: exercise, study, diet, sleep
-# Log from GitHub's web UI: add ONE line per day (order doesn't matter).
-# No line for a day = 0 tasks (renders yellow).
-# Examples:
-# "2026-11-21": [exercise, study]
-# "2026-11-22": [exercise, study, diet, sleep]
+# ============================================================
+#  DAILY TRACKER RECORDS — one line per day, any order
+# ============================================================
+#
+#  TASKS
+#  "YYYY-MM-DD": [task, task, ...]
+#  valid tasks:  exercise, study, diet, sleep
+#  "2026-11-21": [exercise, study]
+#
+#  NOTE (optional, same line as the tasks)
+#  Add ONE quoted string that STARTS with # :
+#  "2026-11-21": [exercise, study, "# ran 5km, slept 6h"]
+#
+#  NOTE RULES
+#  - The note MUST be quoted ("..."). Unquoted # starts a YAML
+#    comment and will eat the rest of your line.
+#  - Put # at the very start of the string (one note per day).
+#  - # inside the note is simply deleted:
+#      "# ran #5km today"   ->  "ran 5km today"
+#  - More than one # string on a line: the LAST one wins,
+#    earlier ones are dropped.
+#  - Avoid | inside a note (it is replaced with /).
+#  - No other characters need escaping.
+#
+#  COLOR RULES (rendered on the grid)
+#  - before 2026-11-20            -> white
+#  - 0 tasks logged that day      -> yellow (warning)
+#  - 1 / 2 / 3 / 4 tasks          -> light green -> dark green
+#  - after today                  -> grey (upcoming)
+#  - today (Beijing time)         -> blue ring
+#  - day with a note but no tasks -> yellow + note shown on hover
+#
+#  BEHAVIOR
+#  - No line for a day  = 0 tasks (yellow), not an error.
+#  - The grid covers 2026 through the current year automatically;
+#    year tabs let you switch years, current year is the default.
+#  - Hover/click a cell for the task breakdown + note.
+#
+#  HOW TO LOG
+#  GitHub web UI -> open this file -> add one line at the bottom
+#  -> commit. (Link is on the homepage under the tracker.)
+#
+#  EXAMPLES
+#  "2026-11-21": [exercise, study, "# ran 5km, slept 6h"]
+#  "2026-11-22": [exercise, study, diet, sleep, "# perfect day"]
+#  "2026-11-23": [sleep]
+#  "2026-11-24": ["# no tasks, just a note"]
+# ============================================================
 
 "2026-11-20": [exercise]

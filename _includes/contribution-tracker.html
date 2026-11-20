@@ -4,12 +4,23 @@
 {% for item in data %}
   {% assign key = item[0] %}
   {% assign val = item[1] %}
-  {% if key | size == 15 %}
-    {% if val %}
-{{ key | slice: 0, 10 }}|note:{{ val | newline_to_spaces | replace: "|", "/" }}
+  {% if val and val | size > 0 %}
+    {% assign tasks = '' %}
+    {% assign note = '' %}
+    {% for t in val %}
+      {% if t contains '#' %}
+        {% assign note = t | replace: '#', '' | newline_to_spaces | replace: '|', '/' %}
+      {% else %}
+        {% if tasks %}{% assign tasks = tasks ~ ',' %}{% endif %}
+        {% assign tasks = tasks ~ t %}
+      {% endif %}
+    {% endfor %}
+    {% if tasks %}
+{{ key }}|{{ tasks }}
     {% endif %}
-  {% elsif val and val | size > 0 %}
-{{ key }}|{{ val | join: "," }}
+    {% if note %}
+{{ key }}|note:{{ note }}
+    {% endif %}
   {% endif %}
 {% endfor %}
 </pre>

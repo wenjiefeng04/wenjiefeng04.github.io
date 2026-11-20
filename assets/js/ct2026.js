@@ -53,6 +53,17 @@
     if (note) rec(dayN).n = note;
   }
 
+  /* ---- self-diagnostics: island has text but nothing parsed = visible red ---- */
+  var parsed = 0, d;
+  for (d in DATA) {
+    if (Object.prototype.hasOwnProperty.call(DATA, d) && (DATA[d].t.length || DATA[d].n)) parsed++;
+  }
+  if (parsed === 0) {
+    yearsEl.innerHTML = '<div class="ct-err">no entries parsed — island received: [' +
+      raw.replace(/\s+/g, ' ').slice(0, 160) + ']</div>';
+    return;
+  }
+  
   if (raw.replace(/\s+/g, '').length === 0) {
     yearsEl.innerHTML = '<div class="ct-err">tracker island is empty — is _data/tracker/records.yml in the build?</div>';
     return;
