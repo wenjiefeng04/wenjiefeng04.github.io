@@ -7,13 +7,18 @@
   var yearsEl = document.getElementById('ct-years');
   if (!dataEl || !yearsEl) return;
 
-  var DATA = {};
+  var DATA = null;
+  var raw = dataEl.textContent || '';
   try {
-    DATA = JSON.parse(dataEl.textContent) || {};
+    DATA = JSON.parse(raw);
   } catch (e) {
-    yearsEl.innerHTML = '<div style="font-size:11px;color:#cf222e">tracker data failed to parse: ' + e.message + '</div>';
+    /* visible debug: show the parser error AND the raw text the pipeline delivered */
+    var snippet = raw.replace(/\s+/g, ' ').slice(0, 200);
+    yearsEl.innerHTML = '<div class="ct-err">tracker data failed to parse: ' + e.message +
+      '<br>raw received: [' + snippet + ']</div>';
     return;
   }
+  if (!DATA || typeof DATA !== 'object') DATA = {};
 
   var START = '2026-11-20';
   var START_YEAR = 2026;

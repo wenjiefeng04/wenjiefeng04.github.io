@@ -1,6 +1,6 @@
 {% assign data = site.data.tracker.records %}
 
-<script type="application/json" id="ct-data">{{ data | to_json }}</script>
+<pre id="ct-data" hidden aria-hidden="true">{{ data | to_json }}</pre>
 
 <style>
   #ct-2026 { font-family: ui-monospace, SFMono-Regular, 'JetBrains Mono', Consolas, monospace;
@@ -25,6 +25,7 @@
                      white-space:nowrap; display:none; }
   #ct-2026 .ct-tip .ok { color:#3fb950; }
   #ct-2026 .ct-tip .no { color:#8b949e; }
+  #ct-2026 .ct-err { font-size:11px; color:#cf222e; grid-column:1/-1; grid-row:3; white-space:pre-wrap; }
 </style>
 
 <div id="ct-2026">
