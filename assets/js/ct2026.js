@@ -1,6 +1,8 @@
-/* Multi-year contribution-style tracker (2026 .. current year) with year tabs.
+/* Multi-year contribution-style tracker (2026 .. current year) with year tabs,
+   daily notes, and progress-bar sync.
    Data: plain-text island #ct-data, rendered by Jekyll from _data/tracker/records.yml.
-   Entry format: YYYY-MM-DD|task,task,task  (one per line; whitespace-tolerant parse).
+   Entry formats: YYYY-MM-DD|task,task
+                  YYYY-MM-DD|note:free text
    Pure client-side: year grids, colors, tooltips, stats, Beijing-time "today". */
 (function () {
   'use strict';
@@ -9,25 +11,48 @@
   var navEl = document.getElementById('ct-years-nav');
   if (!dataEl || !yearsEl || !navEl) return;
 
-  /* ---- data: regex-extract entries (immune to whitespace collapse/concat) ---- */
-  var DATA = {};
-  var raw = dataEl.textContent || '';
-  var entries = raw.match(/\d{4}-\d{2}-\d{2}\|[A-Za-z,]*/g) || [];
-  for (var i = 0; i < entries.length; i++) {
-    var m = entries[i];
-    var sep = m.indexOf('|');
-    var day = m.slice(0, sep);
-    var tasks = m.slice(sep + 1);
-    var arr = [];
-    if (tasks) {
-      var parts = tasks.split(',');
-      for (var j = 0; j < parts.length; j++) {
-        var t = parts[j].replace(/^\s+|\s+$/g, '');
-        if (t) arr.push(t);
-      }
-    }
-    DATA[day] = arr;
+  /* ---- data: whitespace-tolerant regex extraction from the island ---- */
+  var DATA = {}; // day -> { t: [task, ...], n: 'note text' }
+  function rec(day) {
+    if (!DATA[day]) DATA[day] = { t: [], n: '' };
+    return DATA[day];
   }
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  var raw = dataEl.textContent || '';
+
+  // task entries: date + '|' + letters/commas; skip lines that are note lines
+  var taskRe = /\d{4}-\d{2}-\d{2}\|([A-Za-z,]*)/g;
+  var mt;
+  while ((mt = taskRe.exec(raw)) !== null) {
+    var dayT = mt[0].slice(0, 10);
+    var toks = mt[1].split(',');
+    var isNoteLine = false;
+    for (var a = 0; a < toks.length; a++) {
+      if (toks[a].replace(/^\s+|\s+$/g, '') === 'note') { isNoteLine = true; break; }
+    }
+    if (isNoteLine) continue;
+    for (var b = 0; b < toks.length; b++) {
+      var name = toks[b].replace(/^\s+|\s+$/g, '');
+      if (!name) continue;
+      var r = rec(dayT);
+      var dup = false;
+      for (var c = 0; c < r.t.length; c++) if (r.t[c] === name) dup = true;
+      if (!dup) r.t.push(name);
+    }
+  }
+
+  // note entries: date + '|note:' + text up to the next entry (or end)
+  var noteRe = /\d{4}-\d{2}-\d{2}\|note:(.*?)(?=\s*\d{4}-\d{2}-\d{2}\||$)/g;
+  var mn;
+  while ((mn = noteRe.exec(raw)) !== null) {
+    var dayN = mn[0].slice(0, 10);
+    var note = mn[1].replace(/^\s+|\s+$/g, '');
+    if (note) rec(dayN).n = note;
+  }
+
   if (raw.replace(/\s+/g, '').length === 0) {
     yearsEl.innerHTML = '<div class="ct-err">tracker island is empty — is _data/tracker/records.yml in the build?</div>';
     return;
@@ -35,6 +60,7 @@
 
   var START = '2026-11-20';
   var START_YEAR = 2026;
+  var TOTAL_DAYS = 365;
   var TASKS = ['exercise', 'study', 'diet', 'sleep'];
   var COLORS = ['#eac54f', '#9be9a8', '#40c463', '#30a14e', '#216e39'];
   var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -92,7 +118,7 @@
       col = Math.floor(ii / 7) + 2;
       row = (ii % 7) + 2;
       entry = DATA[day];
-      count = entry ? entry.length : 0;
+      count = entry ? entry.t.length : 0;
       if (day < START) bg = '#ffffff';                // before tracker start
       else if (day > TODAY) bg = '#cdd5dc';           // upcoming
       else bg = COLORS[Math.min(count, 4)];           // 0 = yellow, 1..4 = green shades
@@ -104,7 +130,7 @@
     return html;
   }
 
-  /* ---- year tabs: one button per year, default = current year ---- */
+  /* ---- year tabs (corner pills): default = current year ---- */
   var pinned = null;
   function hideTip() { if (!pinned) tip.style.display = 'none'; }
 
@@ -137,28 +163,31 @@
   });
   selectYear(CURRENT_YEAR);
 
-  /* ---- tooltip: hover to follow, click to pin ---- */
+  /* ---- tooltip: hover to follow, click to pin; shows tasks + note ---- */
   function tipHTML(day) {
     var d = new Date(day + 'T00:00:00Z');
     var head = day + ' (' + DOWS[d.getUTCDay()] + ')';
     if (day < START) return head + '<br><span class="no">before tracker start</span>';
     if (day > TODAY) return head + '<br><span class="no">upcoming</span>';
-    var entry = DATA[day] || [];
+    var r = DATA[day];
+    var entry = r ? r.t : [];
     var lines = '';
     for (var jj = 0; jj < TASKS.length; jj++) {
       var done = entry.indexOf(TASKS[jj]) >= 0;
       lines += '<span class="' + (done ? 'ok' : 'no') + '">' + (done ? '\u2713' : '\u2717') + ' ' + TASKS[jj] + '</span>&nbsp;&nbsp;';
     }
-    return head + '<br>' + lines + '<br><b>' + entry.length + '/4</b>' + (entry.length === 4 ? ' &nbsp;perfect!' : '');
+    var html = head + '<br>' + lines + '<br><b>' + entry.length + '/4</b>' + (entry.length === 4 ? ' &nbsp;perfect!' : '');
+    if (r && r.n) html += '<br><span class="note">\u201c' + esc(r.n) + '\u201d</span>';
+    return html;
   }
 
   function showTip(cell, x, y) {
     tip.innerHTML = tipHTML(cell.getAttribute('data-day'));
     tip.style.display = 'block';
-    var r = tip.getBoundingClientRect();
+    var r2 = tip.getBoundingClientRect();
     var left = x + 14;
-    if (left + r.width > window.innerWidth - 8) left = x - r.width - 14;
-    var top = y - r.height - 10;
+    if (left + r2.width > window.innerWidth - 8) left = x - r2.width - 14;
+    var top = y - r2.height - 10;
     if (top < 8) top = y + 18;
     tip.style.left = left + 'px';
     tip.style.top = top + 'px';
@@ -195,8 +224,8 @@
     if (!Object.prototype.hasOwnProperty.call(DATA, k2)) continue;
     v = DATA[k2];
     logged++;
-    tasksSum += v.length;
-    if (v.length === 4) perfect++;
+    tasksSum += v.t.length;
+    if (v.t.length === 4) perfect++;
   }
   var streak = 0;
   var probe = new Date(TODAY + 'T00:00:00Z');
@@ -204,9 +233,34 @@
     var pk = keyOf(probe);
     if (pk < START) break;
     var pe = DATA[pk];
-    if (pe && pe.length > 0) { streak++; probe.setUTCDate(probe.getUTCDate() - 1); }
+    if (pe && pe.t.length > 0) { streak++; probe.setUTCDate(probe.getUTCDate() - 1); }
     else break;
   }
   stats.textContent = logged + 'd logged \u00b7 ' + tasksSum + ' tasks \u00b7 ' +
                       perfect + ' perfect \u00b7 streak ' + streak + 'd';
+
+  /* ---- sync the 365-day progress bar (same Beijing clock, same START) ---- */
+  var pFill = document.getElementById('pbar-fill');
+  if (pFill) {
+    var elapsed = Math.floor(
+      (new Date(TODAY + 'T00:00:00Z') - new Date(START + 'T00:00:00Z')) / 86400000
+    );
+    if (elapsed < 0) elapsed = 0;
+    if (elapsed > TOTAL_DAYS) elapsed = TOTAL_DAYS;
+
+    pFill.style.width = (elapsed * 100 / TOTAL_DAYS) + '%';
+    pFill.style.minWidth = elapsed > 0 ? '2px' : '0';
+
+    var ds = String(elapsed);
+    while (ds.length < 3) ds = '0' + ds;
+    var pctVal = Math.round(elapsed * 10000 / TOTAL_DAYS) / 100; // 0, 0.27, 8.22, 100
+
+    function setText(id, s) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = s;
+    }
+    setText('pbar-day', ds + '/' + TOTAL_DAYS);
+    setText('pbar-pct', pctVal + '%');
+    setText('pbar-remaining', (TOTAL_DAYS - elapsed) + 'd remaining');
+  }
 })();

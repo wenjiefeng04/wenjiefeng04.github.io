@@ -1,32 +1,22 @@
-{% assign day = include.day | default: 0 | plus: 0 %}
-{% assign total = include.total | default: 365 | plus: 0 %}
-{% assign pct = day | times: 100.0 | divided_by: total %}
-{% assign left = total | minus: day %}
-
-<div style="font-family:'JetBrains Mono','Fira Code',Consolas,monospace;
+<!-- 365-day marathon bar. Numbers + fill are computed live by assets/js/ct2026.js
+     (the same Beijing-time clock that drives the tracker) on pages that also
+     include contribution-tracker.html. Falls back to 0 if JS is unavailable. -->
+<div id="pbar" style="font-family:ui-monospace,SFMono-Regular,'JetBrains Mono',Consolas,monospace;
             background:#0d1117; border:1px solid #30363d; border-radius:6px;
             max-width:460px; padding:12px 14px; color:#c9d1d9;">
   <div style="display:flex; justify-content:flex-end; font-size:12px;
               color:#8b949e; margin-bottom:8px; letter-spacing:.5px;">
-    <!-- <span>~/2026 $ cat progress.status</span> -->
-    <span style="color:#3fb950;">{% if day < 100 %}0{% endif %}{% if day < 10 %}0{% endif %}{{ day }}/{{ total }}</span>
+    <span style="color:#3fb950;" id="pbar-day">000/365</span>
   </div>
-
   <div style="position:relative; width:100%; height:12px; background:#161b22;
               border:1px solid #30363d; border-radius:3px; overflow:hidden;">
-    <div style="width:{{ pct }}%;{% if day > 0 %}min-width:2px;{% endif %}
-                height:100%;
+    <div id="pbar-fill" style="width:0%; min-width:0; height:100%;
                 background:linear-gradient(90deg,#238636,#3fb950);
-                box-shadow:0 0 10px rgba(63,185,80,.6);"></div>
-    <div style="position:absolute; inset:0;
-                background:repeating-linear-gradient(to right,
-                  transparent 0, transparent calc(100%/12 - 1px),
-                  #0d1117 calc(100%/12 - 1px), #0d1117 calc(100%/12));"></div>
+                box-shadow:0 0 10px rgba(63,185,80,.6); transition:width .4s;"></div>
   </div>
-
   <div style="display:flex; justify-content:space-between; font-size:12px;
               margin-top:8px; color:#8b949e;">
-    <span>{{ pct | round: 2 }}%</span>
-    <span>{{ left }}d remaining</span>
+    <span id="pbar-pct">0%</span>
+    <span id="pbar-remaining">365d remaining</span>
   </div>
 </div>

@@ -4,7 +4,11 @@
 {% for item in data %}
   {% assign key = item[0] %}
   {% assign val = item[1] %}
-  {% if val and val | size > 0 %}
+  {% if key | size == 15 %}
+    {% if val %}
+{{ key | slice: 0, 10 }}|note:{{ val | newline_to_spaces | replace: "|", "/" }}
+    {% endif %}
+  {% elsif val and val | size > 0 %}
 {{ key }}|{{ val | join: "," }}
   {% endif %}
 {% endfor %}
@@ -14,16 +18,16 @@
   #ct-2026 { font-family: ui-monospace, SFMono-Regular, 'JetBrains Mono', Consolas, monospace;
              background:#f6f8fa; border:1px solid #d0d7de; border-radius:8px;
              padding:14px 16px; color:#24292f; }
-  #ct-2026 .ct-head { display:flex; justify-content:space-between; flex-wrap:wrap;
-                      font-size:12px; color:#57606a; margin-bottom:10px; }
-  #ct-2026 .ct-body { display:flex; gap:12px; align-items:flex-start; }
-  #ct-2026 .ct-years-nav { display:flex; flex-direction:column; gap:4px; flex:none; }
-  #ct-2026 .ct-year-btn { font-family:inherit; font-size:11px; padding:3px 10px;
-                          border:1px solid #d0d7de; border-radius:6px; background:#ffffff;
+  #ct-2026 .ct-head { display:flex; justify-content:space-between; align-items:center;
+                      flex-wrap:wrap; gap:8px; font-size:12px; color:#57606a;
+                      margin-bottom:10px; }
+  #ct-2026 .ct-years-nav { display:flex; flex-direction:row; gap:4px; }
+  #ct-2026 .ct-year-btn { font-family:inherit; font-size:10px; padding:2px 8px;
+                          border:1px solid #d0d7de; border-radius:10px; background:#ffffff;
                           color:#57606a; cursor:pointer; }
   #ct-2026 .ct-year-btn:hover { border-color:#57606a; color:#24292f; }
   #ct-2026 .ct-year-btn.active { background:#0969da; border-color:#0969da; color:#ffffff; }
-  #ct-2026 .ct-scroll { overflow-x:auto; padding-bottom:4px; flex:1; min-width:0; }
+  #ct-2026 .ct-scroll { overflow-x:auto; padding-bottom:4px; }
   #ct-2026 .ct-year-lab { font-size:10px; color:#57606a; margin:0 0 4px 26px; }
   #ct-2026 .ct-grid { display:grid; grid-template-rows:14px repeat(7,10px); gap:2px; width:max-content; }
   #ct-2026 .ct-lab { font-size:9px; color:#8b949e; }
@@ -36,23 +40,22 @@
   #ct-2026 .ct-tip { position:fixed; z-index:9999; background:#24292f; color:#e6edf3;
                      font-size:11px; line-height:1.6; padding:8px 10px; border-radius:6px;
                      box-shadow:0 4px 12px rgba(0,0,0,.3); pointer-events:none;
-                     white-space:nowrap; display:none; }
+                     display:none; white-space:normal; max-width:320px; }
   #ct-2026 .ct-tip .ok { color:#3fb950; }
   #ct-2026 .ct-tip .no { color:#8b949e; }
+  #ct-2026 .ct-tip .note { color:#d29922; font-style:italic; }
   #ct-2026 .ct-err { font-size:11px; color:#cf222e; white-space:pre-wrap; }
 </style>
 
 <div id="ct-2026">
   <div class="ct-head">
     <span>~/tracker $ log --from=2026-11-20 --to=today</span>
+    <div class="ct-years-nav" id="ct-years-nav"></div>
     <span id="ct-stats"></span>
   </div>
-  <div class="ct-body">
-    <div class="ct-years-nav" id="ct-years-nav"></div>
-    <div class="ct-scroll">
-      <div id="ct-years">
-        <div style="font-size:11px;color:#8b949e">building grid&hellip;</div>
-      </div>
+  <div class="ct-scroll">
+    <div id="ct-years">
+      <div style="font-size:11px;color:#8b949e">building grid&hellip;</div>
     </div>
   </div>
   <div class="ct-legend">
