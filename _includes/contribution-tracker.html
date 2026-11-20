@@ -1,0 +1,96 @@
+<!-- GitHub-style contribution tracker, 2026 (static, no JS) -->
+{% assign start_date = '2026-11-20' %}
+{% assign today = site.time | date: "%Y-%m-%d", "+08:00" %}
+{% assign data = site.data.tracker.2026 %}
+
+{% assign month_names = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec' | split: ' ' %}
+{% assign month_days = '0 31 59 90 120 151 181 212 243 273 304 334' | split: ' ' %}
+
+{% assign logged_days = 0 %}
+{% assign tasks_done = 0 %}
+{% assign perfect_days = 0 %}
+{% for k, v in data %}
+  {% assign logged_days = logged_days | plus: 1 %}
+  {% if v %}
+    {% assign tasks_done = tasks_done | plus: v | size %}
+    {% if v | size == 4 %}{% assign perfect_days = perfect_days | plus: 1 %}{% endif %}
+  {% endif %}
+{% endfor %}
+
+<div style="font-family:ui-monospace,SFMono-Regular,'JetBrains Mono',Consolas,monospace;
+            background:#f6f8fa; border:1px solid #d0d7de; border-radius:8px;
+            padding:14px 16px; max-width:760px; color:#24292f;">
+
+  <div style="display:flex; justify-content:space-between; font-size:12px;
+              color:#57606a; margin-bottom:10px;">
+    <span>~/2026 $ tracker --since=2026-11-20</span>
+    <span>{{ logged_days }}d logged · {{ tasks_done }} tasks · {{ perfect_days }} perfect</span>
+  </div>
+
+  <div style="display:grid; grid-template-columns:26px repeat(53,10px);
+              grid-template-rows:14px repeat(7,10px); gap:2px; align-items:center;">
+
+    <span style="grid-column:1; grid-row:2; font-size:9px; color:#8b949e;">Mon</span>
+    <span style="grid-column:1; grid-row:4; font-size:9px; color:#8b949e;">Wed</span>
+    <span style="grid-column:1; grid-row:6; font-size:9px; color:#8b949e;">Fri</span>
+
+    {% for m in (0..11) %}
+      <span style="grid-column:{{ month_days[m] | divided_by: 7 | plus: 2 }}; grid-row:1;
+                   font-size:9px; color:#8b949e;">{{ month_names[m] }}</span>
+    {% endfor %}
+
+    {% for i in (0..364) %}
+      {% assign day_date = '2026-01-01' | days: i | date: '%Y-%m-%d' %}
+      {% assign row = '2026-01-01' | days: i | date: '%w' | plus: 1 %}
+      {% assign col = i | divided_by: 7 | plus: 2 %}
+      {% assign entry = data[day_date] %}
+      {% assign count = 0 %}
+      {% if entry %}{% assign count = entry | size %}{% endif %}
+
+      {% if day_date < start_date %}
+        {% assign bg = '#ffffff' %}
+        {% assign tip = day_date ~ ' — before start' %}
+      {% elsif day_date > today %}
+        {% assign bg = '#cdd5dc' %}
+        {% assign tip = day_date ~ ' — upcoming' %}
+      {% elsif count == 0 %}
+        {% assign bg = '#eac54f' %}
+        {% assign tip = day_date ~ ' — 0/4 · nothing logged' %}
+      {% else %}
+        {% case count %}
+          {% when 1 %}{% assign bg = '#9be9a8' %}
+          {% when 2 %}{% assign bg = '#40c463' %}
+          {% when 3 %}{% assign bg = '#30a14e' %}
+          {% when 4 %}{% assign bg = '#216e39' %}
+        {% endcase %}
+        {% assign tip = day_date ~ ' — ' ~ count ~ '/4 · ' %}
+        {% for t in entry %}
+          {% assign tip = tip ~ t %}
+          {% unless forloop.last %}{% assign tip = tip ~ ' · ' %}{% endunless %}
+        {% endfor %}
+      {% endif %}
+
+      {% assign ring = '' %}
+      {% if day_date == today %}
+        {% assign ring = 'box-shadow:0 0 0 2px #ffffff, 0 0 0 3.5px #58a6ff;' %}
+      {% endif %}
+
+      <div style="width:10px; height:10px; border-radius:3px; background:{{ bg }}; {{ ring }}
+                  grid-column:{{ col }}; grid-row:{{ row }};" title="{{ tip }}"></div>
+    {% endfor %}
+  </div>
+
+  <div style="display:flex; align-items:center; gap:5px; margin-top:10px;
+              font-size:10px; color:#57606a;">
+    <span>0/4</span>
+    <span style="width:10px; height:10px; border-radius:3px; background:#eac54f; display:inline-block;"></span>
+    <span style="width:10px; height:10px; border-radius:3px; background:#9be9a8; display:inline-block;"></span>
+    <span style="width:10px; height:10px; border-radius:3px; background:#40c463; display:inline-block;"></span>
+    <span style="width:10px; height:10px; border-radius:3px; background:#30a14e; display:inline-block;"></span>
+    <span style="width:10px; height:10px; border-radius:3px; background:#216e39; display:inline-block;"></span>
+    <span>4/4</span>
+    <span style="margin-left:8px;">white = before start</span>
+    <span style="margin-left:8px;">grey = upcoming</span>
+    <span style="margin-left:8px; color:#58a6ff;">ring = today (Beijing)</span>
+  </div>
+</div>

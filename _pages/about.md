@@ -21,3 +21,7 @@ Here is my TODOs:
 - 1.5 hrs play
 
 > Please notice, divide working hours like 4 hours and 4 hours, and maintain at least 1 and better 2 4-hours at max concentration and efficiency
+
+Daily tracker:
+{% include contribution-tracker.html %}
+[Log](https://github.com/wenjiefeng04/wenjiefeng04.github.io/edit/master/_data/tracker/2026.yml)

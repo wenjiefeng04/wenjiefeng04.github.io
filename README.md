@@ -8,7 +8,8 @@ This is my (Wenjie Feng's) personal website, forked from **Academic Pages**, whi
 ```
 <!-- {% if page.share %}{% include social-share.html %}{% endif %} -->
 ``` 
-in `_layouts\single.html` and `_layouts\talk.html`. 
+in `_layouts\single.html` and `_layouts\talk.html`.
+
 3. Linking the **CV** button to directly download my cv pdf file by changing the url of CV in `_data/navigation.yml` from `/cv/` to `/files/cv.pdf` and exclude `_pages/cv.md`, `_pages/cv-json.md` and `_data/cv.json`. 
 4. All input .md files should be in the format of `YYYY-MM-DD-XXX.md`
 5. If want to write something but not publishing it: write `drafts: true` for blogs only; for the rest, exclude them in `_config.yaml`

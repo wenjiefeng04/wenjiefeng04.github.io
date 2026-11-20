@@ -1,0 +1,9 @@
+# 2026 daily tracker data
+# Tasks: exercise, study, diet, sleep
+# Log from GitHub's web UI: add ONE line per day (order doesn't matter).
+# No line for a day = 0 tasks (renders yellow).
+# Examples:
+# "2026-11-21": [exercise, study]
+# "2026-11-22": [exercise, study, diet, sleep]
+
+"2026-11-20": [exercise]
