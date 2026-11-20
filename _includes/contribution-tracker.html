@@ -5,22 +5,7 @@
   {% assign key = item[0] %}
   {% assign val = item[1] %}
   {% if val and val | size > 0 %}
-    {% assign tasks = '' %}
-    {% assign note = '' %}
-    {% for t in val %}
-      {% if t contains '#' %}
-        {% assign note = t | replace: '#', '' | newline_to_spaces | replace: '|', '/' %}
-      {% else %}
-        {% if tasks %}{% assign tasks = tasks ~ ',' %}{% endif %}
-        {% assign tasks = tasks ~ t %}
-      {% endif %}
-    {% endfor %}
-    {% if tasks %}
-{{ key }}|{{ tasks }}
-    {% endif %}
-    {% if note %}
-{{ key }}|note:{{ note }}
-    {% endif %}
+{{ key }}|{{ val | join: "," }}
   {% endif %}
 {% endfor %}
 </pre>

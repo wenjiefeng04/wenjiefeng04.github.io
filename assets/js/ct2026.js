@@ -1,8 +1,6 @@
-/* Multi-year contribution-style tracker (2026 .. current year) with year tabs,
-   daily notes, and progress-bar sync.
-   Data: plain-text island #ct-data, rendered by Jekyll from _data/tracker/records.yml.
-   Entry formats: YYYY-MM-DD|task,task
-                  YYYY-MM-DD|note:free text
+/* Multi-year contribution-style tracker (2026 .. current year): year pills,
+   daily notes, progress-bar sync.
+   Data island #ct-data: one line per day  YYYY-MM-DD|task,task[, "# note text"]
    Pure client-side: year grids, colors, tooltips, stats, Beijing-time "today". */
 (function () {
   'use strict';
@@ -11,8 +9,8 @@
   var navEl = document.getElementById('ct-years-nav');
   if (!dataEl || !yearsEl || !navEl) return;
 
-  /* ---- data: whitespace-tolerant regex extraction from the island ---- */
-  var DATA = {}; // day -> { t: [task, ...], n: 'note text' }
+  /* ---- data: split the island on date anchors (whitespace-tolerant) ---- */
+  var DATA = {}; // day -> { t: [task, ...], n: 'note' }
   function rec(day) {
     if (!DATA[day]) DATA[day] = { t: [], n: '' };
     return DATA[day];
@@ -22,50 +20,41 @@
   }
 
   var raw = dataEl.textContent || '';
+  var anchorRe = /\d{4}-\d{2}-\d{2}\|/g;
+  var anchors = [];
+  var m;
+  while ((m = anchorRe.exec(raw)) !== null) anchors.push(m.index);
 
-  // task entries: date + '|' + letters/commas; skip lines that are note lines
-  var taskRe = /\d{4}-\d{2}-\d{2}\|([A-Za-z,]*)/g;
-  var mt;
-  while ((mt = taskRe.exec(raw)) !== null) {
-    var dayT = mt[0].slice(0, 10);
-    var toks = mt[1].split(',');
-    var isNoteLine = false;
-    for (var a = 0; a < toks.length; a++) {
-      if (toks[a].replace(/^\s+|\s+$/g, '') === 'note') { isNoteLine = true; break; }
-    }
-    if (isNoteLine) continue;
-    for (var b = 0; b < toks.length; b++) {
-      var name = toks[b].replace(/^\s+|\s+$/g, '');
-      if (!name) continue;
-      var r = rec(dayT);
-      var dup = false;
-      for (var c = 0; c < r.t.length; c++) if (r.t[c] === name) dup = true;
-      if (!dup) r.t.push(name);
+  for (var i = 0; i < anchors.length; i++) {
+    var s = anchors[i];
+    var e = (i + 1 < anchors.length) ? anchors[i + 1] : raw.length;
+    var day = raw.slice(s, s + 10);
+    var content = raw.slice(s + 11, e).replace(/^\s+|\s+$/g, '');
+    var r = rec(day);
+
+    var hash = content.indexOf('#');
+    var taskPart = hash >= 0 ? content.slice(0, hash) : content;
+    if (hash >= 0) r.n = content.slice(hash + 1).replace(/#/g, '').replace(/^\s+|\s+$/g, '');
+
+    var toks = taskPart.split(',');
+    for (var j = 0; j < toks.length; j++) {
+      var name = toks[j].replace(/^\s+|\s+$/g, '');
+      if (name && r.t.indexOf(name) < 0) r.t.push(name);
     }
   }
 
-  // note entries: date + '|note:' + text up to the next entry (or end)
-  var noteRe = /\d{4}-\d{2}-\d{2}\|note:(.*?)(?=\s*\d{4}-\d{2}-\d{2}\||$)/g;
-  var mn;
-  while ((mn = noteRe.exec(raw)) !== null) {
-    var dayN = mn[0].slice(0, 10);
-    var note = mn[1].replace(/^\s+|\s+$/g, '');
-    if (note) rec(dayN).n = note;
-  }
-
-  /* ---- self-diagnostics: island has text but nothing parsed = visible red ---- */
-  var parsed = 0, d;
+  /* ---- visible diagnostics: island present but nothing parsed ---- */
+  var parsedDays = 0, d;
   for (d in DATA) {
-    if (Object.prototype.hasOwnProperty.call(DATA, d) && (DATA[d].t.length || DATA[d].n)) parsed++;
+    if (Object.prototype.hasOwnProperty.call(DATA, d) && (DATA[d].t.length || DATA[d].n)) parsedDays++;
   }
-  if (parsed === 0) {
-    yearsEl.innerHTML = '<div class="ct-err">no entries parsed — island received: [' +
-      raw.replace(/\s+/g, ' ').slice(0, 160) + ']</div>';
-    return;
-  }
-  
   if (raw.replace(/\s+/g, '').length === 0) {
     yearsEl.innerHTML = '<div class="ct-err">tracker island is empty — is _data/tracker/records.yml in the build?</div>';
+    return;
+  }
+  if (anchors.length === 0 || parsedDays === 0) {
+    yearsEl.innerHTML = '<div class="ct-err">no entries parsed — island received: [' +
+      raw.replace(/\s+/g, ' ').slice(0, 160) + ']</div>';
     return;
   }
 
@@ -81,7 +70,7 @@
   var stats = document.getElementById('ct-stats');
 
   function pad(n) { return n < 10 ? '0' + n : '' + n; }
-  function keyOf(d) { return d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate()); }
+  function keyOf(d2) { return d2.getUTCFullYear() + '-' + pad(d2.getUTCMonth() + 1) + '-' + pad(d2.getUTCDate()); }
 
   /* "today" in Asia/Shanghai (UTC+8, no DST) — live in the visitor's browser */
   var TODAY = keyOf(new Date(Date.now() + 8 * 3600 * 1000));
@@ -93,22 +82,22 @@
     var yEnd = y + '-12-31';
     var cells = [];
     var cur = new Date(Date.UTC(y, 0, 1));
-    cur.setUTCDate(1 - cur.getUTCDay());              // back to Sunday (underflows into Dec correctly)
+    cur.setUTCDate(1 - cur.getUTCDay());
     var end = new Date(Date.UTC(y, 11, 31));
     while (cur <= end) {
       var k = keyOf(cur);
       cells.push((k < yStart || k > yEnd) ? null : k);
       cur.setUTCDate(cur.getUTCDate() + 1);
     }
-    while (cells.length % 7 !== 0) cells.push(null);  // pad to whole weeks
-    var cols = cells.length / 7;                      // 53 or 54 depending on year
+    while (cells.length % 7 !== 0) cells.push(null);
+    var cols = cells.length / 7;
 
     var html = '<div class="ct-year-view">';
     html += '<div class="ct-year-lab">' + y + '</div>';
     html += '<div class="ct-grid" style="grid-template-columns:26px repeat(' + cols + ',10px)">';
 
-    var mm, ii, first, col, row, day, entry, count, bg;
-    for (mm = 0; mm < 12; mm++) {                     // month labels at the first week containing the month
+    var mm, ii, first, col, row, dayKey, entry, count, bg;
+    for (mm = 0; mm < 12; mm++) {
       var prefix = y + '-' + pad(mm + 1) + '-';
       first = -1;
       for (ii = 0; ii < cells.length; ii++) {
@@ -119,29 +108,29 @@
         html += '<span class="ct-lab" style="grid-column:' + col + ';grid-row:1">' + MONTHS[mm] + '</span>';
       }
     }
-    html += '<span class="ct-lab" style="grid-column:1;grid-row:3">Mon</span>' +   // rows 2..8 = Sun..Sat
+    html += '<span class="ct-lab" style="grid-column:1;grid-row:3">Mon</span>' +
             '<span class="ct-lab" style="grid-column:1;grid-row:5">Wed</span>' +
             '<span class="ct-lab" style="grid-column:1;grid-row:7">Fri</span>';
 
     for (ii = 0; ii < cells.length; ii++) {
-      day = cells[ii];
-      if (!day) continue;
+      dayKey = cells[ii];
+      if (!dayKey) continue;
       col = Math.floor(ii / 7) + 2;
       row = (ii % 7) + 2;
-      entry = DATA[day];
+      entry = DATA[dayKey];
       count = entry ? entry.t.length : 0;
-      if (day < START) bg = '#ffffff';                // before tracker start
-      else if (day > TODAY) bg = '#cdd5dc';           // upcoming
-      else bg = COLORS[Math.min(count, 4)];           // 0 = yellow, 1..4 = green shades
-      html += '<div class="ct-cell' + (day === TODAY ? ' ct-today' : '') +
-              '" data-day="' + day +
+      if (dayKey < START) bg = '#ffffff';
+      else if (dayKey > TODAY) bg = '#cdd5dc';
+      else bg = COLORS[Math.min(count, 4)];
+      html += '<div class="ct-cell' + (dayKey === TODAY ? ' ct-today' : '') +
+              '" data-day="' + dayKey +
               '" style="background:' + bg + ';grid-column:' + col + ';grid-row:' + row + '"></div>';
     }
     html += '</div></div>';
     return html;
   }
 
-  /* ---- year tabs (corner pills): default = current year ---- */
+  /* ---- year pills (top-right corner): default = current year ---- */
   var pinned = null;
   function hideTip() { if (!pinned) tip.style.display = 'none'; }
 
@@ -174,31 +163,31 @@
   });
   selectYear(CURRENT_YEAR);
 
-  /* ---- tooltip: hover to follow, click to pin; shows tasks + note ---- */
+  /* ---- tooltip: hover to follow, click to pin; tasks + note ---- */
   function tipHTML(day) {
-    var d = new Date(day + 'T00:00:00Z');
-    var head = day + ' (' + DOWS[d.getUTCDay()] + ')';
+    var d2 = new Date(day + 'T00:00:00Z');
+    var head = day + ' (' + DOWS[d2.getUTCDay()] + ')';
     if (day < START) return head + '<br><span class="no">before tracker start</span>';
     if (day > TODAY) return head + '<br><span class="no">upcoming</span>';
-    var r = DATA[day];
-    var entry = r ? r.t : [];
+    var r2 = DATA[day];
+    var entry = r2 ? r2.t : [];
     var lines = '';
     for (var jj = 0; jj < TASKS.length; jj++) {
       var done = entry.indexOf(TASKS[jj]) >= 0;
       lines += '<span class="' + (done ? 'ok' : 'no') + '">' + (done ? '\u2713' : '\u2717') + ' ' + TASKS[jj] + '</span>&nbsp;&nbsp;';
     }
     var html = head + '<br>' + lines + '<br><b>' + entry.length + '/4</b>' + (entry.length === 4 ? ' &nbsp;perfect!' : '');
-    if (r && r.n) html += '<br><span class="note">\u201c' + esc(r.n) + '\u201d</span>';
+    if (r2 && r2.n) html += '<br><span class="note">\u201c' + esc(r2.n) + '\u201d</span>';
     return html;
   }
 
   function showTip(cell, x, y) {
     tip.innerHTML = tipHTML(cell.getAttribute('data-day'));
     tip.style.display = 'block';
-    var r2 = tip.getBoundingClientRect();
+    var r3 = tip.getBoundingClientRect();
     var left = x + 14;
-    if (left + r2.width > window.innerWidth - 8) left = x - r2.width - 14;
-    var top = y - r2.height - 10;
+    if (left + r3.width > window.innerWidth - 8) left = x - r3.width - 14;
+    var top = y - r3.height - 10;
     if (top < 8) top = y + 18;
     tip.style.left = left + 'px';
     tip.style.top = top + 'px';
@@ -264,11 +253,11 @@
 
     var ds = String(elapsed);
     while (ds.length < 3) ds = '0' + ds;
-    var pctVal = Math.round(elapsed * 10000 / TOTAL_DAYS) / 100; // 0, 0.27, 8.22, 100
+    var pctVal = Math.round(elapsed * 10000 / TOTAL_DAYS) / 100;
 
-    function setText(id, s) {
+    function setText(id, str) {
       var el = document.getElementById(id);
-      if (el) el.textContent = s;
+      if (el) el.textContent = str;
     }
     setText('pbar-day', ds + '/' + TOTAL_DAYS);
     setText('pbar-pct', pctVal + '%');
