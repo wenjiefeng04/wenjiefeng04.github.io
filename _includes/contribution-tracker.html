@@ -1,6 +1,6 @@
-<!-- Interactive GitHub-style contribution tracker, 2026.
-     Liquid only embeds the log data as JSON; everything else is client-side. -->
-{% assign data = site.data.tracker.2026 %}
+{% assign data = site.data.tracker.records %}
+
+<script type="application/json" id="ct-data">{{ data | to_json }}</script>
 
 <style>
   #ct-2026 { font-family: ui-monospace, SFMono-Regular, 'JetBrains Mono', Consolas, monospace;
@@ -9,8 +9,9 @@
   #ct-2026 .ct-head { display:flex; justify-content:space-between; flex-wrap:wrap;
                       font-size:12px; color:#57606a; margin-bottom:10px; }
   #ct-2026 .ct-scroll { overflow-x:auto; padding-bottom:4px; }
-  #ct-2026 .ct-grid { display:grid; grid-template-columns:26px repeat(53,10px);
-                      grid-template-rows:14px repeat(7,10px); gap:2px; width:max-content; }
+  #ct-2026 .ct-year-lab { font-size:10px; color:#57606a; margin:12px 0 4px 26px; }
+  #ct-2026 .ct-year-block:first-child .ct-year-lab { margin-top:0; }
+  #ct-2026 .ct-grid { display:grid; grid-template-rows:14px repeat(7,10px); gap:2px; width:max-content; }
   #ct-2026 .ct-lab { font-size:9px; color:#8b949e; }
   #ct-2026 .ct-cell { width:10px; height:10px; border-radius:3px; cursor:pointer; }
   #ct-2026 .ct-cell:hover { outline:1px solid #57606a; }
@@ -28,11 +29,13 @@
 
 <div id="ct-2026">
   <div class="ct-head">
-    <span>~/2026 $ tracker --since=2026-11-20</span>
+    <span>~/tracker $ log --from=2026-11-20 --to=today</span>
     <span id="ct-stats"></span>
   </div>
   <div class="ct-scroll">
-    <div class="ct-grid" id="ct-grid"></div>
+    <div id="ct-years">
+      <div style="font-size:11px;color:#8b949e">building grid&hellip;</div>
+    </div>
   </div>
   <div class="ct-legend">
     <span>0/4</span>
@@ -45,148 +48,9 @@
     <span style="margin-left:8px">white = before start</span>
     <span style="margin-left:8px">grey = upcoming</span>
     <span style="margin-left:8px;color:#58a6ff">ring = today, live in Beijing time</span>
-    <span style="margin-left:8px">click a day to pin details</span>
+    <span style="margin-left:8px">hover/click a day for details</span>
   </div>
   <div class="ct-tip" id="ct-tip"></div>
 </div>
 
-<script>
-(function () {
-  var DATA = {{ data | to_json }} || {};
-  var START = '2026-11-20';
-  var TASKS = ['exercise', 'study', 'diet', 'sleep'];
-  var COLORS = { 0: '#eac54f', 1: '#9be9a8', 2: '#40c463', 3: '#30a14e', 4: '#216e39' };
-  var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  var DOWS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  var grid = document.getElementById('ct-grid');
-  var tip = document.getElementById('ct-tip');
-  var stats = document.getElementById('ct-stats');
-
-  function pad(n) { return n < 10 ? '0' + n : '' + n; }
-
-  // today in Asia/Shanghai (UTC+8, no DST) — computed live in the visitor's browser
-  function todayBJ() {
-    var bj = new Date(Date.now() + 8 * 3600 * 1000);
-    return bj.getUTCFullYear() + '-' + pad(bj.getUTCMonth() + 1) + '-' + pad(bj.getUTCDate());
-  }
-  var TODAY = todayBJ();
-
-  // build 2026 cells, from the Sunday on/before Jan 1 through the Sat after Dec 31
-  var cells = [];
-  var cur = new Date(Date.UTC(2026, 0, 1));
-  cur.setUTCDate(1 - cur.getUTCDay());
-  var end = new Date(Date.UTC(2026, 11, 31));
-  while (cur <= end) {
-    var key = cur.getUTCFullYear() + '-' + pad(cur.getUTCMonth() + 1) + '-' + pad(cur.getUTCDate());
-    cells.push((key < '2026-01-01' || key > '2026-12-31') ? null : key);
-    cur.setUTCDate(cur.getUTCDate() + 1);
-  }
-  while (cells.length % 7 !== 0) cells.push(null);
-
-  // month labels at the first week of each month
-  var html = '';
-  var m, i, first, col;
-  for (m = 0; m < 12; m++) {
-    var prefix = '2026-' + pad(m + 1) + '-';
-    first = -1;
-    for (i = 0; i < cells.length; i++) {
-      if (cells[i] && cells[i].indexOf(prefix) === 0) { first = i; break; }
-    }
-    if (first >= 0) {
-      col = Math.floor(first / 7) + 2;
-      html += '<span class="ct-lab" style="grid-column:' + col + ';grid-row:1">' + MONTHS[m] + '</span>';
-    }
-  }
-  html += '<span class="ct-lab" style="grid-column:1;grid-row:3">Mon</span>';
-  html += '<span class="ct-lab" style="grid-column:1;grid-row:5">Wed</span>';
-  html += '<span class="ct-lab" style="grid-column:1;grid-row:7">Fri</span>';
-
-  // the cells: row = weekday (Sun=row 2 .. Sat=row 8), col = week + 2
-  for (i = 0; i < cells.length; i++) {
-    var day = cells[i];
-    if (!day) continue;
-    col = Math.floor(i / 7) + 2;
-    var row = (i % 7) + 2;
-    var entry = DATA[day];
-    var count = entry ? entry.length : 0;
-    var bg;
-    if (day < START) bg = '#ffffff';
-    else if (day > TODAY) bg = '#cdd5dc';
-    else bg = COLORS[count];
-    html += '<div class="ct-cell' + (day === TODAY ? ' ct-today' : '') +
-      '" data-day="' + day + '" ' +
-      'style="background:' + bg + ';grid-column:' + col + ';grid-row:' + row + '"></div>';
-  }
-  grid.innerHTML = html;
-
-  // tooltip
-  function tipHTML(day) {
-    var d = new Date(day + 'T00:00:00Z');
-    var head = day + ' (' + DOWS[d.getUTCDay()] + ')';
-    if (day < START) return head + '<br><span class="no">before tracker start</span>';
-    if (day > TODAY) return head + '<br><span class="no">upcoming</span>';
-    var entry = DATA[day] || [];
-    var lines = TASKS.map(function (t) {
-      var done = entry.indexOf(t) >= 0;
-      return '<span class="' + (done ? 'ok' : 'no') + '">' + (done ? '\u2713' : '\u2717') + ' ' + t + '</span>';
-    }).join('&nbsp;&nbsp;');
-    return head + '<br>' + lines + '<br><b>' + entry.length + '/4</b>' +
-      (entry.length === 4 ? ' &nbsp;perfect!' : '');
-  }
-
-  var pinned = null;
-  function showTip(cell, x, y) {
-    tip.innerHTML = tipHTML(cell.getAttribute('data-day'));
-    tip.style.display = 'block';
-    var r = tip.getBoundingClientRect();
-    var left = x + 14;
-    if (left + r.width > window.innerWidth - 8) left = x - r.width - 14;
-    var top = y - r.height - 10;
-    if (top < 8) top = y + 18;
-    tip.style.left = left + 'px';
-    tip.style.top = top + 'px';
-  }
-  function hideTip() { if (!pinned) tip.style.display = 'none'; }
-
-  grid.addEventListener('mousemove', function (e) {
-    if (pinned) return;
-    var cell = e.target.closest ? e.target.closest('.ct-cell') : null;
-    if (cell) showTip(cell, e.clientX, e.clientY);
-    else hideTip();
-  });
-  grid.addEventListener('mouseleave', hideTip);
-  grid.addEventListener('click', function (e) {
-    var cell = e.target.closest ? e.target.closest('.ct-cell') : null;
-    if (!cell) return;
-    e.stopPropagation();
-    if (pinned === cell) { pinned = null; hideTip(); return; }
-    pinned = cell;
-    var r = cell.getBoundingClientRect();
-    showTip(cell, r.left + r.width / 2, r.top);
-  });
-  document.addEventListener('click', function () { pinned = null; hideTip(); });
-
-  // stats: logged days, total tasks, perfect days, current streak
-  var logged = 0, tasks = 0, perfect = 0;
-  for (var k in DATA) {
-    if (!DATA.hasOwnProperty(k)) continue;
-    var v = DATA[k];
-    if (v && v.length !== undefined) {
-      logged++;
-      tasks += v.length;
-      if (v.length === 4) perfect++;
-    }
-  }
-  var streak = 0;
-  var probe = new Date(TODAY + 'T00:00:00Z');
-  while (true) {
-    var pk = probe.getUTCFullYear() + '-' + pad(probe.getUTCMonth() + 1) + '-' + pad(probe.getUTCDate());
-    if (pk < START) break;
-    var pe = DATA[pk];
-    if (pe && pe.length > 0) { streak++; probe.setUTCDate(probe.getUTCDate() - 1); }
-    else break;
-  }
-  stats.innerHTML = logged + 'd logged &middot; ' + tasks + ' tasks &middot; ' +
-                    perfect + ' perfect &middot; streak ' + streak + 'd';
-})();
-</script>
+<script src="/assets/js/ct2026.js" defer></script>

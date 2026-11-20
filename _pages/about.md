@@ -24,4 +24,4 @@ Here is my TODOs:
 
 Daily tracker:
 {% include contribution-tracker.html %}
-[Log](https://github.com/wenjiefeng04/wenjiefeng04.github.io/edit/master/_data/tracker/2026.yml)
+[Log](https://github.com/wenjiefeng04/wenjiefeng04.github.io/edit/master/_data/tracker/records.yml)

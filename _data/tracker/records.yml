@@ -1,4 +1,7 @@
-# 2026 daily tracker data
+# All tracker records, every year. One line per day, any order.
+# Format: "YYYY-MM-DD": [task, ...]  
+# A day with no line = 0 tasks (renders yellow once that date has passed).
+# The tracker grid covers 2026 through the current year automatically.
 # Tasks: exercise, study, diet, sleep
 # Log from GitHub's web UI: add ONE line per day (order doesn't matter).
 # No line for a day = 0 tasks (renders yellow).
