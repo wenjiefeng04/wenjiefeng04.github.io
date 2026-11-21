@@ -218,14 +218,16 @@
   });
   document.addEventListener('click', function () { pinned = null; hideTip(); });
 
-  /* ---- stats (all years) ---- */
+  /* ---- stats (all years); a "logged" day = a day with >= 1 task ---- */
   var logged = 0, tasksSum = 0, perfect = 0, k2, v;
   for (k2 in DATA) {
     if (!Object.prototype.hasOwnProperty.call(DATA, k2)) continue;
     v = DATA[k2];
-    logged++;
-    tasksSum += v.t.length;
-    if (v.t.length === 4) perfect++;
+    if (v.t.length > 0) {
+      logged++;
+      tasksSum += v.t.length;
+      if (v.t.length === 4) perfect++;
+    }
   }
   var streak = 0;
   var probe = new Date(TODAY + 'T00:00:00Z');
@@ -239,28 +241,39 @@
   stats.textContent = logged + 'd logged \u00b7 ' + tasksSum + ' tasks \u00b7 ' +
                       perfect + ' perfect \u00b7 streak ' + streak + 'd';
 
-  /* ---- sync the 365-day progress bar (same Beijing clock, same START) ---- */
+  /* ---- sync the 365-day progress bar ----
+     Numerator = COUNTED DAYS: days since START on which >= 1 task was logged
+     (same condition as the "d logged" stat, same DATA as the grid — one
+     definition, three displays, cannot disagree).
+     The bar therefore advances when you log a day, not when the calendar turns. */
   var pFill = document.getElementById('pbar-fill');
   if (pFill) {
-    var elapsed = Math.floor(
-      (new Date(TODAY + 'T00:00:00Z') - new Date(START + 'T00:00:00Z')) / 86400000
-    );
-    if (elapsed < 0) elapsed = 0;
-    if (elapsed > TOTAL_DAYS) elapsed = TOTAL_DAYS;
-
-    pFill.style.width = (elapsed * 100 / TOTAL_DAYS) + '%';
-    pFill.style.minWidth = elapsed > 0 ? '2px' : '0';
-
-    var ds = String(elapsed);
-    while (ds.length < 3) ds = '0' + ds;
-    var pctVal = Math.round(elapsed * 10000 / TOTAL_DAYS) / 100;
-
     function setText(id, str) {
       var el = document.getElementById(id);
       if (el) el.textContent = str;
     }
+
+    var counted = 0;
+    for (var dk in DATA) {
+      if (!Object.prototype.hasOwnProperty.call(DATA, dk)) continue;
+      if (dk >= START && DATA[dk].t.length > 0) counted++;
+    }
+    if (counted > TOTAL_DAYS) counted = TOTAL_DAYS;
+
+    pFill.style.width = (counted * 100 / TOTAL_DAYS) + '%';
+    pFill.style.minWidth = counted > 0 ? '2px' : '0';
+
+    var ds = String(counted);
+    while (ds.length < 3) ds = '0' + ds;
+    var pctVal = Math.round(counted * 10000 / TOTAL_DAYS) / 100; // 0, 0.27, 0.55, ..., 100
+
     setText('pbar-day', ds + '/' + TOTAL_DAYS);
     setText('pbar-pct', pctVal + '%');
-    setText('pbar-remaining', (TOTAL_DAYS - elapsed) + 'd remaining');
+    setText('pbar-remaining', (TOTAL_DAYS - counted) + 'd to go');
+
+    /* live Beijing-time clock: proof the script ran */
+    var bj = new Date(Date.now() + 8 * 3600 * 1000);
+    setText('pbar-clock', bj.getUTCFullYear() + '-' + pad(bj.getUTCMonth() + 1) + '-' +
+      pad(bj.getUTCDate()) + ' ' + pad(bj.getUTCHours()) + ':' + pad(bj.getUTCMinutes()) + ' Beijing');
   }
 })();
