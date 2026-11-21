@@ -17,7 +17,7 @@ TODOs:
 - 1 hour exercise (30 mins walk + 30 mins strength)
 - 10 hrs work (5 hrs AI study/research + 5 hrs others; can also be 6/4) **4 hrs high quality MIN**
 - healthy diet and **lose weight** 
-- 7-8 hrs sleep
+- 7-8 hrs sleep (wake up on time)
 - 1.5 hrs play
 
 > Please notice, divide working hours like 4 hours and 4 hours, and maintain at least 1 and better 2 4-hours at max concentration and efficiency
