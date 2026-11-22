@@ -7,6 +7,7 @@ redirect_from:
   - /about.html
 ---
 <a id="about-me"></a>
+# About
 I am currently a 1st year PhD student majored in Artificial Intelligence in CUHKSZ. 
 
 <a id="news"></a>
