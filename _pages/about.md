@@ -20,13 +20,13 @@ I am currently a 1st year PhD student majored in Artificial Intelligence in CUHK
 # Educations
 
 - *2026.09 - Present*, Ph.D. student in Artificial Intelligence, School of Artificial Intelligence, CUHK-SZ.
-- *2022.09 - 2026-08*, B.Eng. in Computer Science and Engineering, School of Data Science, CUHK-SZ.
+- *2022.09 - 2026-07*, B.Eng. in Computer Science and Engineering, School of Data Science, CUHK-SZ.
 
 <a id="publications"></a>
 # Publications
 
-- **Wenjie Feng**, Sahba Zojaji, Satoshi Nakamura, "Synergistic Multiple-Source Calibration: A Novel Strategy for Depression Severity Estimation via Patient-Therapist Dialogues" (*Submitted to ICASSP 2026*)
-- Junyi Ao, Dekun Chen, Xiaohai Tian, **Wenjie Feng**, Jun Zhang, Lu Lu, Yuxuan Wang, Haizhou Li, Zhizheng Wu, "SOLLA: Towards a Speech-Oriented LLM That Hears Acoustic Context" (*Preprint, 2025*)
+- **Wenjie Feng**, Sahba Zojaji, Satoshi Nakamura, "Synergistic Multiple-Source Calibration: A Novel Strategy for Depression Severity Estimation via Patient-Therapist Dialogues", *Submitted to ICASSP 2026*
+- Junyi Ao, Dekun Chen, Xiaohai Tian, **Wenjie Feng**, Jun Zhang, Lu Lu, Yuxuan Wang, Haizhou Li, Zhizheng Wu, "SOLLA: Towards a Speech-Oriented LLM That Hears Acoustic Context", *Preprint, 2025*
 
 <a id="teaching"></a>
 # Teaching
