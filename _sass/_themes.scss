@@ -13,16 +13,10 @@ $doc-font-size              : 16;
 $paragraph-indent           : false; // true, false (default)
 $indent-var                 : 1.3em;
 
-// /* System typefaces */
-// $serif                      : Georgia, Times, serif;
-// $sans-serif                 : -apple-system, ".SFNSText-Regular", "San Francisco", "Roboto", "Segoe UI", "Helvetica Neue", "Lucida Grande", Arial, sans-serif;
-// $monospace                  : Monaco, Consolas, "Lucida Console", monospace;
-
-/* Typefaces — Times New Roman site-wide (cross-platform fallback chain) */
-$times-new-roman            : "Times New Roman", Times, "Liberation Serif", "Nimbus Roman", "Songti SC", "SimSun", serif;
-$serif                      : $times-new-roman;
-$sans-serif                 : $times-new-roman;   /* body + headings both become Times */
-$monospace                  : Monaco, Consolas, "Lucida Console", monospace;  /* code keeps its monospace */
+/* Latin + CJK, one stack; system fonts as offline fallback */
+$sans-serif : "Inter", "Noto Sans SC", -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+$serif      : "Lora", "Noto Serif SC", Georgia, serif;   /* only used if you set serif accents */
+$monospace  : "JetBrains Mono", Monaco, Consolas, "Lucida Console", monospace;
 
 /* Sans serif typefaces */
 $sans-serif-narrow          : $sans-serif;
@@ -35,15 +29,21 @@ $bodoni                     : "Bodoni MT", serif;
 $calisto                    : "Calisto MT", serif;
 $garamond                   : Garamond, serif;
 
-/* Type scale */
-$type-size-1                : 2.441em;  // ~39.056px
-$type-size-2                : 1.953em;  // ~31.248px
-$type-size-3                : 1.563em;  // ~25.008px
-$type-size-4                : 1.25em;   // ~20px
-$type-size-5                : 1em;      // ~16px
-$type-size-6                : 0.75em;   // ~12px
-$type-size-7                : 0.6875em; // ~11px
-$type-size-8                : 0.625em;  // ~10px
+/* ---------- Typography scale — two knobs ----------
+   $root-font-size : body text size in px (also the base all ems multiply against)
+   $scale-ratio    : how much bigger each heading step is = the "heft"
+   Don't hand-edit the $type-size-* lines; they're derived.           */
+$root-font-size : 17;   /* 16 = compact … 19 = airy          ← body knob  */
+$scale-ratio    : 1.15; /* 1.15 subtle … 1.4 strong          ← heading knob */
+
+$type-size-1 : #{$scale-ratio * $scale-ratio * $scale-ratio}em;  /* hero (rare) */
+$type-size-2 : #{$scale-ratio * $scale-ratio}em;                 /* ~1.56 */
+$type-size-3 : #{$scale-ratio * $scale-ratio}em;                 /* h1  ← your # sections */
+$type-size-4 : #{$scale-ratio}em;                                /* h2 */
+$type-size-5 : 1em;                                              /* body / h3 */
+$type-size-6 : 0.75em;                                           /* small (fixed) */
+$type-size-7 : 0.6875em;
+$type-size-8 : 0.625em;
 
 $global-font-family         : $sans-serif;
 $header-font-family         : $sans-serif;

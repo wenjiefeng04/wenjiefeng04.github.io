@@ -5,13 +5,12 @@
 @include border-box-sizing;
 
 html {
-  /* apply a natural box layout model to all elements */
   box-sizing: border-box;
   background-color: var(--global-bg-color);
-  font-size: 15px; /*16*/
+  font-size: #{$root-font-size}px;                 /* body knob, live */
 
   @include breakpoint($medium) {
-    font-size: 17px; /*18*/
+    font-size: #{$root-font-size + 2}px;           /* desktop a touch larger */
   }
 
   -webkit-text-size-adjust: 100%;
