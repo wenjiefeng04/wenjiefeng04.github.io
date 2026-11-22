@@ -33,7 +33,7 @@ $garamond                   : Garamond, serif;
    $root-font-size : body text size in px (also the base all ems multiply against)
    $scale-ratio    : how much bigger each heading step is = the "heft"
    Don't hand-edit the $type-size-* lines; they're derived.           */
-$root-font-size : 17;   /* 16 = compact … 19 = airy          ← body knob  */
+$root-font-size : 16;   /* 16 = compact … 19 = airy          ← body knob  */
 $scale-ratio    : 1.15; /* 1.15 subtle … 1.4 strong          ← heading knob */
 
 $type-size-1 : #{$scale-ratio * $scale-ratio * $scale-ratio}em;  /* hero (rare) */
