@@ -10,8 +10,7 @@ I am currently a 1st year PhD student majored in Artificial Intelligence in CUHK
 
 And now I am doing a marathon on AI study, physical wellbeing, mental discipline and control, and the seek of meaningful joy and better lifestyle. Now we intend to do **EVERYTHING below EVEYDAY! NO MATTER WHAT!**.
 
-Progress (starting 2026.11.20) {% include progress-bar.html %}
-
+Progress on Self-study (starting 2026.11.20) {% include progress-bar.html %}
 
 TODOs:
 - 1 hour exercise (30 mins walk + 30 mins strength)
