@@ -242,10 +242,10 @@
                       perfect + ' perfect \u00b7 streak ' + streak + 'd';
 
   /* ---- sync the 365-day progress bar ----
-     Numerator = COUNTED DAYS: days since START on which >= 1 task was logged
-     (same condition as the "d logged" stat, same DATA as the grid — one
-     definition, three displays, cannot disagree).
-     The bar therefore advances when you log a day, not when the calendar turns. */
+     Numerator = days since START on which the BAR_TASK task was logged.
+     Set BAR_TASK to re-target the bar: 'study', 'exercise', 'diet', 'sleep'
+     (or '' for "any task at all"). */
+  var BAR_TASK = 'study';
   var pFill = document.getElementById('pbar-fill');
   if (pFill) {
     function setText(id, str) {
@@ -256,7 +256,12 @@
     var counted = 0;
     for (var dk in DATA) {
       if (!Object.prototype.hasOwnProperty.call(DATA, dk)) continue;
-      if (dk >= START && DATA[dk].t.length > 0) counted++;
+      if (dk < START) continue;
+      if (!BAR_TASK) {
+        if (DATA[dk].t.length > 0) counted++;
+      } else if (DATA[dk].t.indexOf(BAR_TASK) >= 0) {
+        counted++;
+      }
     }
     if (counted > TOTAL_DAYS) counted = TOTAL_DAYS;
 
@@ -265,7 +270,7 @@
 
     var ds = String(counted);
     while (ds.length < 3) ds = '0' + ds;
-    var pctVal = Math.round(counted * 10000 / TOTAL_DAYS) / 100; // 0, 0.27, 0.55, ..., 100
+    var pctVal = Math.round(counted * 10000 / TOTAL_DAYS) / 100; // 0, 0.27, ..., 100
 
     setText('pbar-day', ds + '/' + TOTAL_DAYS);
     setText('pbar-pct', pctVal + '%');
