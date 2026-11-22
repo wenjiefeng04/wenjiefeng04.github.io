@@ -9,7 +9,7 @@
 
 main:
   - title: "Publications"
-    url: /publications/
+    url: /#publications
 
   # - title: "Talks"  # all talks is stored in /_talks dir via .md format. And follow the same format as the example has shown.  
   #   url: /talks/    
@@ -21,20 +21,20 @@ main:
     url: /projects/
 
   - title: "Teaching"
-    url: /teaching/    
-  
-  # - title: "Blogs"
-  #   url: /year-archive/
-  
-  # - title: "Portfolio"
-  #   url: /portfolio/
-
-  # - title: "Blog Posts"
-  #   url: /year-archive/
+    url: /#teaching  
 
   - title: "CV"
     url: /files/cv.pdf
     
+  - title: "About"
+    url: /#about-me
+
+  # - title: "Honors"
+  #   url: /#honors
+
+  # - title: "News"
+  #   url: /#news
+
   # - title: "CV"
   #   url: /cv-json/
     

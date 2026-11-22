@@ -13,10 +13,16 @@ $doc-font-size              : 16;
 $paragraph-indent           : false; // true, false (default)
 $indent-var                 : 1.3em;
 
-/* System typefaces */
-$serif                      : Georgia, Times, serif;
-$sans-serif                 : -apple-system, ".SFNSText-Regular", "San Francisco", "Roboto", "Segoe UI", "Helvetica Neue", "Lucida Grande", Arial, sans-serif;
-$monospace                  : Monaco, Consolas, "Lucida Console", monospace;
+// /* System typefaces */
+// $serif                      : Georgia, Times, serif;
+// $sans-serif                 : -apple-system, ".SFNSText-Regular", "San Francisco", "Roboto", "Segoe UI", "Helvetica Neue", "Lucida Grande", Arial, sans-serif;
+// $monospace                  : Monaco, Consolas, "Lucida Console", monospace;
+
+/* Typefaces — Times New Roman site-wide (cross-platform fallback chain) */
+$times-new-roman            : "Times New Roman", Times, "Liberation Serif", "Nimbus Roman", "Songti SC", "SimSun", serif;
+$serif                      : $times-new-roman;
+$sans-serif                 : $times-new-roman;   /* body + headings both become Times */
+$monospace                  : Monaco, Consolas, "Lucida Console", monospace;  /* code keeps its monospace */
 
 /* Sans serif typefaces */
 $sans-serif-narrow          : $sans-serif;
