@@ -14,5 +14,8 @@ in `_layouts\single.html` and `_layouts\talk.html`.
 4. All input .md files should be in the format of `YYYY-MM-DD-XXX.md`
 5. If want to write something but not publishing it: write `drafts: true` for blogs only; for the rest, exclude them in `_config.yaml`
 6. `Project` .md should be put under `\_portfolio` folder
+7. I have commented out Honors and News in `navigation.yml`
+8. Font and szie modifications should be on `_sass\_themes.scss` and `_sass\layout\_reset.scss`
+
 
 See more info at https://academicpages.github.io/
