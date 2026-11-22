@@ -9,9 +9,9 @@ html {
   background-color: var(--global-bg-color);
   font-size: #{$root-font-size}px;                 /* body knob, live */
 
-  @include breakpoint($medium) {
-    font-size: #{$root-font-size + 2}px;           /* desktop a touch larger */
-  }
+  // @include breakpoint($medium) {
+  //   font-size: #{$root-font-size + 2}px;           /* desktop a touch larger */
+  // }
 
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
