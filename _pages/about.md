@@ -11,7 +11,7 @@ redirect_from:
 I am currently a 1st year PhD student majored in Artificial Intelligence in CUHKSZ. 
 
 <a id="news"></a>
-# 🔥 News
+# News
 
 - *2026.11*: 🎉🎉 Started the [365-day self-study marathon](/#marathon) — daily logs below.
 <!-- - *2026.*: 🎉🎉 Submitted "Synergistic Multiple-Source Calibration" to ICASSP 2026. -->
