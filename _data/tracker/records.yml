@@ -41,11 +41,14 @@
 #  -> commit. (Link is on the homepage under the tracker.)
 #
 #  EXAMPLES
+# The appropriate order should be [sleep, exercise, study, diet]
+# Log "slee' and "exercise" when get into office in the morning, log "study" when leave the office, and log "diet" in the dorm
 #  "2026-11-21": [exercise, study, "# ran 5km, slept 6h"]
 #  "2026-11-22": [exercise, study, diet, sleep, "# perfect day"]
 #  "2026-11-23": [sleep]
 #  "2026-11-24": ["# no tasks, just a note"]
 # ============================================================
+"2026-11-23":[exercise, diet, "# lunch:shaw for protein; dinner:pleasure. Must rest early and not seek simple dopamine, to follow a more disciplined schedule for a more productive life. Treasure time and leverage most of it not wasting them. Pay attention to small things or things may just to seem break rules by a little bit, they actually matter the most 无小事"]
 "2026-11-22": [exercise, "# think about better diet place for Sunday; pause on CS336 for a while because focusing on RL and AIE6001 (must get straight A for both; only All A can be nominated for outstanding graduate GPA!!!); buth the progress bar there shall always warn me and motivate me; 0.5 kilo fruit later"]
 "2026-11-21": [exercise, "# wake up on time and reat early, also start CS336 and RL tomorrow; not on diet, quit soda gradually"]
 "2026-11-20": [exercise, "# starting day, trial run, should take this more serious"]
